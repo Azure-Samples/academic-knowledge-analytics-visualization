@@ -1,0 +1,47 @@
+﻿USE DATABASE AcdemicGraph;
+
+DECLARE @FieldOfStudy string = "computer science";
+DECLARE @FieldAuthorsOutPath string = @"/output/fieldTopAuthors/topComputerScienceAuthors.tsv";
+
+@fieldPaperIds =
+    SELECT PaperFieldOfStudy.PaperId
+    FROM FieldOfStudy
+         JOIN
+             PaperFieldOfStudy
+         ON FieldOfStudy.FieldOfStudyId == PaperFieldOfStudy.FieldOfStudyId
+    WHERE FieldOfStudy.NormalizedName == @FieldOfStudy;
+
+
+@fieldCitations =
+    SELECT PaperReference.PaperId,
+           PaperReference.PaperReferenceId 
+    FROM PaperReference
+         JOIN
+             @fieldPaperIds
+         ON @fieldPaperIds.PaperId == PaperReference.PaperReferenceId;
+
+
+@fieldPapersWithCitationCount =
+    SELECT @fieldCitations.PaperReferenceId AS PaperId,
+           COUNT( * ) AS CitationCount
+    FROM @fieldCitations
+    GROUP BY @fieldCitations.PaperReferenceId;
+
+@fieldAuthors =
+    SELECT Author.AuthorId,
+           ANY_VALUE(Author.DisplayName) AS AuthorName, //Guaranteed to have only 1 value since AuthorId is the key
+           COUNT(@fieldPapersWithCitationCount.PaperId) AS PublicationCount,
+           SUM(@fieldPapersWithCitationCount.CitationCount) AS CitationCount
+    FROM Author
+         JOIN
+             PaperAuthorAffiliation
+         ON Author.AuthorId == PaperAuthorAffiliation.AuthorId //Joining Author/PaperAuthorAffiliation to get author id, diplay name, paper id
+         JOIN
+             @fieldPapersWithCitationCount
+         ON PaperAuthorAffiliation.PaperId == @fieldPapersWithCitationCount.PaperId
+    GROUP BY Author.AuthorId;
+
+
+OUTPUT @fieldAuthors
+TO @FieldAuthorsOutPath
+USING Outputters.Tsv(outputHeader:true);

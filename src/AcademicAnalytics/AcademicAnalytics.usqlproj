@@ -1,0 +1,54 @@
+﻿<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>7cee7d00-a99c-480a-8f7c-8adbed6a0abb</ProjectGuid>
+    <OutputType>File</OutputType>
+    <AssemblyName>Algebra.xml</AssemblyName>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <Name>AcademicAnalytics</Name>
+    <RootNamespace>AcademicAnalytics</RootNamespace>
+    <RuntimeVersion>default</RuntimeVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\Debug\</OutputPath>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugSymbols>false</DebugSymbols>
+    <OutputPath>bin\Release\</OutputPath>
+  </PropertyGroup>
+  <ItemGroup>
+    <Script Include="0. Common Scripts\CreateDatabase.usql" />
+    <Script Include="1. Field Top Authors\AggregateAuthorStatsInField.usql" />
+    <Script Include="2. Conference Top Authors By Static Rank\AuthorRankInConference.usql" />
+    <ScriptCode Include="0. Common Scripts\CreateDatabase.usql.cs">
+      <DependentUpon>0. Common Scripts\CreateDatabase.usql</DependentUpon>
+    </ScriptCode>
+    <ScriptCode Include="1. Field Top Authors\AggregateAuthorStatsInField.usql.cs">
+      <DependentUpon>1. Field Top Authors\AggregateAuthorStatsInField.usql</DependentUpon>
+    </ScriptCode>
+    <ScriptCode Include="2. Conference Top Authors By Static Rank\AuthorRankInConference.usql.cs">
+      <DependentUpon>2. Conference Top Authors By Static Rank\AuthorRankInConference.usql</DependentUpon>
+    </ScriptCode>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="1. Field Top Authors" />
+    <Folder Include="0. Common Scripts" />
+    <Folder Include="2. Conference Top Authors By Static Rank" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="1. Field Top Authors\Field Top Authors.pbix">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="2. Conference Top Authors By Static Rank\ConferenceTopAuthorsByStaticRank.pbix">
+      <SubType>Content</SubType>
+    </Content>
+  </ItemGroup>
+  <!-- check for SDK Build target in current path then in USQLSDKPath in the case of command line build -->
+  <Import Project="UsqlSDKBuild.targets" Condition="'$(BuildingInsideVisualStudio)' != 'true' And  Exists('UsqlSDKBuild.targets')" />
+  <Import Project="$(USQLSDKPath)\UsqlSDKBuild.targets" Condition="'$(BuildingInsideVisualStudio)' != 'true' And !Exists('UsqlSDKBuild.targets') And '$(USQLSDKPath)' != '' And Exists('$(USQLSDKPath)\UsqlSDKBuild.targets')" />
+  <!-- backward compatible with IDE build -->
+  <Import Project="$(AppData)\Microsoft\DataLake\MsBuild\1.0\Usql.targets" Condition="'$(BuildingInsideVisualStudio)' == 'true'" />
+</Project>

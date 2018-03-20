@@ -1,0 +1,58 @@
+﻿USE DATABASE AcdemicGraph;
+
+DECLARE @conferenceAnalyticsBaseDir string = @"/output/conferenceAnalytics/";
+DECLARE @conferenceShortName string = "WWW";
+DECLARE @outputBaseDir string = @conferenceAnalyticsBaseDir + @conferenceShortName + "/";
+
+
+DECLARE @authorRankOutPath string = @outputBaseDir + "conferenceTopAuthorsByStaticRank.csv";
+
+@allconferencePapers =
+    SELECT PaperId,
+           Rank,
+           (long)ConferenceSeriesId AS ConferenceSeriesId  //Cast from long? to long
+    FROM Paper
+    WHERE ConferenceSeriesId IS NOT NULL;
+
+
+@conferencePapers =
+    SELECT @allconferencePapers.PaperId,
+           (@allconferencePapers.Rank * -0.001) AS LogProbRank //Rank is stored in the graph as LogProbRank*-1000
+    FROM @allconferencePapers
+         JOIN
+             ConferenceSeries
+         ON  @allconferencePapers.ConferenceSeriesId == ConferenceSeries.ConferenceSeriesId
+    WHERE ConferenceSeries.NormalizedName == @conferenceShortName;
+
+@conferenceAuthorsPapers =
+    SELECT Author.DisplayName AS AuthorName,
+           Author.AuthorId,
+           @conferencePapers.PaperId,
+           @conferencePapers.LogProbRank AS LogProbRank 
+    FROM @conferencePapers
+         JOIN
+             PaperAuthorAffiliation
+         ON @conferencePapers.PaperId == PaperAuthorAffiliation.PaperId
+         JOIN
+             Author
+         ON PaperAuthorAffiliation.AuthorId == Author.AuthorId;
+
+@conferenceAuthorRanks =
+    SELECT ANY_VALUE(@conferenceAuthorsPapers.AuthorName) AS AuthorName, //Guaranteed to have only 1 value since AuthorId is the key
+           COUNT( * ) AS PublicationCount,
+           SUM(Math.Exp(@conferenceAuthorsPapers.LogProbRank)) AS AuthorProbRank //Adding paper rank up to create author rank
+    FROM @conferenceAuthorsPapers
+    GROUP BY @conferenceAuthorsPapers.AuthorId
+    ORDER BY AuthorProbRank DESC
+    FETCH 20 ROWS; //Only consider the top 20 authors
+
+@conferenceAuthorRanks =
+    SELECT AuthorName,
+           PublicationCount,
+           RANK() OVER(ORDER BY AuthorProbRank DESC) AS AuthorRank,
+           RANK() OVER(ORDER BY (AuthorProbRank / PublicationCount) DESC) AS AuthorNormalizedRank //Consider average quality of paper instead of sum
+    FROM @conferenceAuthorRanks;
+
+OUTPUT @conferenceAuthorRanks
+TO @authorRankOutPath
+USING Outputters.Tsv(outputHeader : true);
