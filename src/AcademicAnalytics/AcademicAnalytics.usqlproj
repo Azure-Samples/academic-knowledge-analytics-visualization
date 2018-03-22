@@ -23,6 +23,7 @@
     <Script Include="0. Common Scripts\CreateDatabase.usql" />
     <Script Include="1. Field Top Authors\AggregateAuthorStatsInField.usql" />
     <Script Include="2. Conference Top Authors By Static Rank\AuthorRankInConference.usql" />
+    <Script Include="8. Conference Top Referenced Venues\AggregateConferenceReferencesByYearAndVenue.usql" />
     <Script Include="9. Conference Top Cited Venues\AggregateConferenceCitationsByYearAndVenue.usql" />
     <ScriptCode Include="0. Common Scripts\CreateDatabase.usql.cs">
       <DependentUpon>0. Common Scripts\CreateDatabase.usql</DependentUpon>
@@ -33,6 +34,9 @@
     <ScriptCode Include="2. Conference Top Authors By Static Rank\AuthorRankInConference.usql.cs">
       <DependentUpon>2. Conference Top Authors By Static Rank\AuthorRankInConference.usql</DependentUpon>
     </ScriptCode>
+    <ScriptCode Include="8. Conference Top Referenced Venues\AggregateConferenceReferencesByYearAndVenue.usql.cs">
+      <DependentUpon>8. Conference Top Referenced Venues\AggregateConferenceReferencesByYearAndVenue.usql</DependentUpon>
+    </ScriptCode>
     <ScriptCode Include="9. Conference Top Cited Venues\AggregateConferenceCitationsByYearAndVenue.usql.cs">
       <DependentUpon>9. Conference Top Cited Venues\AggregateConferenceCitationsByYearAndVenue.usql</DependentUpon>
     </ScriptCode>
@@ -41,6 +45,7 @@
     <Folder Include="1. Field Top Authors" />
     <Folder Include="0. Common Scripts" />
     <Folder Include="2. Conference Top Authors By Static Rank" />
+    <Folder Include="8. Conference Top Referenced Venues" />
     <Folder Include="9. Conference Top Cited Venues" />
   </ItemGroup>
   <ItemGroup>
@@ -48,6 +53,9 @@
       <SubType>Content</SubType>
     </Content>
     <Content Include="2. Conference Top Authors By Static Rank\ConferenceTopAuthorsByStaticRank.pbix">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="8. Conference Top Referenced Venues\ConferenceOutgoingReferences.pbix">
       <SubType>Content</SubType>
     </Content>
     <Content Include="9. Conference Top Cited Venues\ConferenceIncomingCitations.pbix">
