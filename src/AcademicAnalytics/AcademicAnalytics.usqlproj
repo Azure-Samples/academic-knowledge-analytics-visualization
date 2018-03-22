@@ -23,6 +23,7 @@
     <Script Include="0. Common Scripts\CreateDatabase.usql" />
     <Script Include="1. Field Top Authors\AggregateAuthorStatsInField.usql" />
     <Script Include="2. Conference Top Authors By Static Rank\AuthorRankInConference.usql" />
+    <Script Include="4. Conference Top Papers\SelectTopPapersInConference.usql" />
     <Script Include="7. Conference Memory of References\AggregateConferenceReferencesByYear.usql" />
     <Script Include="8. Conference Top Referenced Venues\AggregateConferenceReferencesByYearAndVenue.usql" />
     <Script Include="9. Conference Top Cited Venues\AggregateConferenceCitationsByYearAndVenue.usql" />
@@ -34,6 +35,9 @@
     </ScriptCode>
     <ScriptCode Include="2. Conference Top Authors By Static Rank\AuthorRankInConference.usql.cs">
       <DependentUpon>2. Conference Top Authors By Static Rank\AuthorRankInConference.usql</DependentUpon>
+    </ScriptCode>
+    <ScriptCode Include="4. Conference Top Papers\SelectTopPapersInConference.usql.cs">
+      <DependentUpon>4. Conference Top Papers\SelectTopPapersInConference.usql</DependentUpon>
     </ScriptCode>
     <ScriptCode Include="7. Conference Memory of References\AggregateConferenceReferencesByYear.usql.cs">
       <DependentUpon>7. Conference Memory of References\AggregateConferenceReferencesByYear.usql</DependentUpon>
@@ -49,6 +53,7 @@
     <Folder Include="1. Field Top Authors" />
     <Folder Include="0. Common Scripts" />
     <Folder Include="2. Conference Top Authors By Static Rank" />
+    <Folder Include="4. Conference Top Papers" />
     <Folder Include="7. Conference Memory of References" />
     <Folder Include="8. Conference Top Referenced Venues" />
     <Folder Include="9. Conference Top Cited Venues" />
@@ -58,6 +63,9 @@
       <SubType>Content</SubType>
     </Content>
     <Content Include="2. Conference Top Authors By Static Rank\ConferenceTopAuthorsByStaticRank.pbix">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="4. Conference Top Papers\ConferenceTopPapers.pbix">
       <SubType>Content</SubType>
     </Content>
     <Content Include="7. Conference Memory of References\ConferenceMemoryOfReferences.pbix">
