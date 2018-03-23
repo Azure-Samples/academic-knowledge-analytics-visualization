@@ -26,6 +26,7 @@
     <Script Include="3. Conference Papers Basic Statistics\PaperYearlyStatisticsInConference.usql" />
     <Script Include="4. Conference Top Papers\SelectTopPapersInConference.usql" />
     <Script Include="5. Conference Top Authors\ConferenceTopAuthors.usql" />
+    <Script Include="6. Conference Top Institutions\ConferenceTopInstitutions.usql" />
     <Script Include="7. Conference Memory of References\AggregateConferenceReferencesByYear.usql" />
     <Script Include="8. Conference Top Referenced Venues\AggregateConferenceReferencesByYearAndVenue.usql" />
     <Script Include="9. Conference Top Cited Venues\AggregateConferenceCitationsByYearAndVenue.usql" />
@@ -47,6 +48,9 @@
     <ScriptCode Include="5. Conference Top Authors\ConferenceTopAuthors.usql.cs">
       <DependentUpon>5. Conference Top Authors\ConferenceTopAuthors.usql</DependentUpon>
     </ScriptCode>
+    <ScriptCode Include="6. Conference Top Institutions\ConferenceTopInstitutions.usql.cs">
+      <DependentUpon>6. Conference Top Institutions\ConferenceTopInstitutions.usql</DependentUpon>
+    </ScriptCode>
     <ScriptCode Include="7. Conference Memory of References\AggregateConferenceReferencesByYear.usql.cs">
       <DependentUpon>7. Conference Memory of References\AggregateConferenceReferencesByYear.usql</DependentUpon>
     </ScriptCode>
@@ -67,6 +71,7 @@
     <Folder Include="7. Conference Memory of References" />
     <Folder Include="8. Conference Top Referenced Venues" />
     <Folder Include="9. Conference Top Cited Venues" />
+    <Folder Include="6. Conference Top Institutions" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="1. Field Top Authors\FieldTopAuthors.pbix">
@@ -82,6 +87,9 @@
       <SubType>Content</SubType>
     </Content>
     <Content Include="5. Conference Top Authors\ConferenceTopAuthors.pbix">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="6. Conference Top Institutions\ConferenceTopInstitutions.pbix">
       <SubType>Content</SubType>
     </Content>
     <Content Include="7. Conference Memory of References\ConferenceMemoryOfReferences.pbix">
