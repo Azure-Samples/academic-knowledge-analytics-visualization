@@ -64,7 +64,7 @@
     <Folder Include="9. Conference Top Cited Venues" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="1. Field Top Authors\Field Top Authors.pbix">
+    <Content Include="1. Field Top Authors\FieldTopAuthors.pbix">
       <SubType>Content</SubType>
     </Content>
     <Content Include="2. Conference Top Authors By Static Rank\ConferenceTopAuthorsByStaticRank.pbix">
