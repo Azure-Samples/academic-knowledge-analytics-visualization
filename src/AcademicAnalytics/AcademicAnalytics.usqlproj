@@ -30,6 +30,7 @@
     <Script Include="7. Conference Memory of References\AggregateConferenceReferencesByYear.usql" />
     <Script Include="8. Conference Top Referenced Venues\AggregateConferenceReferencesByYearAndVenue.usql" />
     <Script Include="9. Conference Top Cited Venues\AggregateConferenceCitationsByYearAndVenue.usql" />
+    <Script Include="11. Conference Hot Topics\ConferenceFieldsOfStudyByHotness.usql" />
     <ScriptCode Include="0. Common Scripts\CreateDatabase.usql.cs">
       <DependentUpon>0. Common Scripts\CreateDatabase.usql</DependentUpon>
     </ScriptCode>
@@ -60,18 +61,22 @@
     <ScriptCode Include="9. Conference Top Cited Venues\AggregateConferenceCitationsByYearAndVenue.usql.cs">
       <DependentUpon>9. Conference Top Cited Venues\AggregateConferenceCitationsByYearAndVenue.usql</DependentUpon>
     </ScriptCode>
+    <ScriptCode Include="11. Conference Hot Topics\ConferenceFieldsOfStudyByHotness.usql.cs">
+      <DependentUpon>11. Conference Hot Topics\ConferenceFieldsOfStudyByHotness.usql</DependentUpon>
+    </ScriptCode>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="1. Field Top Authors" />
     <Folder Include="0. Common Scripts" />
+    <Folder Include="1. Field Top Authors" />
     <Folder Include="2. Conference Top Authors By Static Rank" />
     <Folder Include="3. Conference Papers Basic Statistics" />
     <Folder Include="4. Conference Top Papers" />
     <Folder Include="5. Conference Top Authors" />
+    <Folder Include="6. Conference Top Institutions" />
     <Folder Include="7. Conference Memory of References" />
     <Folder Include="8. Conference Top Referenced Venues" />
     <Folder Include="9. Conference Top Cited Venues" />
-    <Folder Include="6. Conference Top Institutions" />
+    <Folder Include="11. Conference Hot Topics" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="1. Field Top Authors\FieldTopAuthors.pbix">
@@ -99,6 +104,9 @@
       <SubType>Content</SubType>
     </Content>
     <Content Include="9. Conference Top Cited Venues\ConferenceIncomingCitations.pbix">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="11. Conference Hot Topics\ConferenceHotTopics.pbix">
       <SubType>Content</SubType>
     </Content>
   </ItemGroup>

@@ -1,0 +1,141 @@
+﻿//Make sure to run CreateDatabase script from common scripts first!
+USE DATABASE AcdemicGraph;
+
+//*******************Input Variable Section********************************
+//        Change these variables for different calculations
+//*************************************************************************
+DECLARE @conferenceShortName string = "WWW"; //Conference abbreviated name 
+DECLARE @confFieldHotnessStartYear int = 2012; //Settings for calculating fields of study hotness. 
+
+//*******************Constant Variable Section*****************************
+//        Defining const variables to be used by other parts of the script
+//*************************************************************************
+//This output path is hardcoded to the pbi file. If this is changed, pbi file needs to be modified as well
+DECLARE @conferenceAnalyticsBaseDir string = @"/output/conferenceAnalytics/";
+DECLARE @outputBaseDir string = @conferenceAnalyticsBaseDir + @conferenceShortName + "/";
+//Used for calculating fields of study hotness. 
+DECLARE @lastYear int = DateTime.Today.Year - 1; 
+
+//*************************Ouptut Section**********************************
+//                 All output files for this script.
+//*************************************************************************
+DECLARE @conferenceFieldsOfStudyOutPath string = @"/output/conferenceAnalytics/" + @conferenceShortName+ "/conferenceFieldsOfStudy.tsv";
+DECLARE @conferenceFieldsOfStudyYearlyStatsOutPath string = @"/output/conferenceAnalytics/" + @conferenceShortName+ "/conferenceFieldsOfStudyYearlyStats.tsv";
+
+
+
+
+//First find the conference series id by matching conference short name.
+@targetConferenceSeriesId =
+    SELECT (long?) ConferenceSeriesId AS ConferenceSeriesId //Cast long to long? to join against Paper table
+    FROM ConferenceSeries
+    WHERE NormalizedName == @conferenceShortName;
+
+
+//Get all conference papers by conference series Id.
+@conferencePapers =
+    SELECT Paper.PaperId,
+           Paper.CitationCount,
+           Paper.Year
+    FROM Paper
+         INNER JOIN
+             @targetConferenceSeriesId
+         ON Paper.ConferenceSeriesId == @targetConferenceSeriesId.ConferenceSeriesId;
+
+
+//Calculate hotness for each conference field of study
+//Hotness = Citation Growth Rate * Citation Growth  (Mutiplying citation growth to normalize such that new and old topics can be more comparable)
+//        = CitationCountFromLastYear / CitationCountFromStartYear * TotalCitationCountBetweenStartYearAndNow
+@conferencePapersFosHotness =
+    SELECT PaperFieldOfStudy.FieldOfStudyId,
+           //Saftely cast int? to int since a paper must have year attribute.
+           (int) MIN(@conferencePapers.Year) AS FieldMinYear, 
+           (int) MAX(@conferencePapers.Year) AS FieldMaxYear,
+
+           //Total citions from last year
+           ((double)   //Casting to double first since we want fractions after division
+           SUM(@conferencePapers.Year == @lastYear ? 
+                          @conferencePapers.CitationCount : 0))  /
+           //Total citations from start yeear
+           Math.Max(1, //In case start year citation is 0, force it to be 1 to avoid division by 0 error
+               (long)(SUM(@conferencePapers.Year == @confFieldHotnessStartYear ? 
+                            @conferencePapers.CitationCount : 0 ) *
+                      //Total citation count between start year and now = Sum citation if paper year is within start and last year
+                      SUM((@conferencePapers.Year >= @confFieldHotnessStartYear && @conferencePapers.Year <= @lastYear) ? 
+                            @conferencePapers.CitationCount : 0))
+           ) AS Hotness
+    FROM @conferencePapers
+         INNER JOIN
+             PaperFieldOfStudy
+         ON @conferencePapers.PaperId == PaperFieldOfStudy.PaperId
+    GROUP BY PaperFieldOfStudy.FieldOfStudyId;
+
+
+//For each conference field of study, get additional fields of study information from FieldOfStudy table
+@conferenceFieldOfStudy =
+    SELECT FieldOfStudy.FieldOfStudyId,
+           FieldOfStudy.DisplayName AS FieldName,
+           FieldOfStudy.Level,
+           @conferencePapersFosHotness.FieldMinYear,
+           @conferencePapersFosHotness.FieldMaxYear,
+           @conferencePapersFosHotness.Hotness          
+    FROM FieldOfStudy
+         INNER JOIN
+             @conferencePapersFosHotness
+         ON @conferencePapersFosHotness.FieldOfStudyId == FieldOfStudy.FieldOfStudyId;
+
+OUTPUT @conferenceFieldOfStudy
+TO @conferenceFieldsOfStudyOutPath
+USING Outputters.Tsv(outputHeader : true);
+
+
+// This table is to guarentee the line chart visual for accumulative citation/publication over time doesn't have broken lines even if a field of study doesn't have any publication for some years.
+// This forces accumulative citation/publication count will be generated for each year even there isn't a publication for that year. 
+@conferenceFieldOfStudyYearly =
+    SELECT @conferenceFieldOfStudy.FieldOfStudyId,
+           f.Year
+    FROM @conferenceFieldOfStudy
+//For each conference field of study, create a [FieldOfStudyId, Year] row from Year = @FieldOfStudy.FieldMinYear to  @conferenceFieldOfStudy.FieldMaxYear
+         CROSS APPLY
+             EXPLODE(
+                        Enumerable.Range(@conferenceFieldOfStudy.FieldMinYear - 1, //Include min year - 1 so each line always starts at 0
+                                         @conferenceFieldOfStudy.FieldMaxYear - @conferenceFieldOfStudy.FieldMinYear + 1) // +1 such that max year is included
+                    ) AS f(Year);  
+
+
+//Get citation/publication count for each field of study per year
+@conferencePapersFosYearlyStats =
+    SELECT @conferenceFieldOfStudyYearly.FieldOfStudyId,
+           @conferenceFieldOfStudyYearly.Year,
+           SUM(@conferencePapers.Year == null? 0 : 1) AS PublicationCount,
+           SUM(@conferencePapers.Year == null? 0: @conferencePapers.CitationCount) AS CitationCount
+    FROM @conferencePapers
+         INNER JOIN
+             PaperFieldOfStudy
+         ON @conferencePapers.PaperId == PaperFieldOfStudy.PaperId
+         RIGHT OUTER JOIN //Right outer such that we include each year from @conferenceFieldOfStudyYearly even if there's no citation
+             @conferenceFieldOfStudyYearly
+         ON PaperFieldOfStudy.FieldOfStudyId == @conferenceFieldOfStudyYearly.FieldOfStudyId && @conferencePapers.Year == @conferenceFieldOfStudyYearly.Year
+    GROUP BY @conferenceFieldOfStudyYearly.FieldOfStudyId,
+             @conferenceFieldOfStudyYearly.Year;
+
+
+//Get accumulative citation/publication count for each field of study per year
+@conferencePapersFosYearlyStats =
+    SELECT @conferencePapersFosYearlyStats.FieldOfStudyId,
+           @conferencePapersFosYearlyStats.Year,
+           ANY_VALUE(@conferencePapersFosYearlyStats.PublicationCount) AS PublicationCount,
+           ANY_VALUE(@conferencePapersFosYearlyStats.CitationCount) AS CitationCount,
+           SUM(dict.Year <= @conferencePapersFosYearlyStats.Year ? dict.PublicationCount : 0 ) AS AccumulativePublicationCount,
+           SUM(dict.Year <= @conferencePapersFosYearlyStats.Year ? dict.CitationCount : 0) AS AccumulativeCitationCount
+    FROM @conferencePapersFosYearlyStats
+         JOIN
+             @conferencePapersFosYearlyStats AS dict
+         ON @conferencePapersFosYearlyStats.FieldOfStudyId == dict.FieldOfStudyId
+    GROUP BY @conferencePapersFosYearlyStats.FieldOfStudyId,
+             @conferencePapersFosYearlyStats.Year;
+
+
+OUTPUT @conferencePapersFosYearlyStats
+TO @conferenceFieldsOfStudyYearlyStatsOutPath
+USING Outputters.Tsv(outputHeader : true);
