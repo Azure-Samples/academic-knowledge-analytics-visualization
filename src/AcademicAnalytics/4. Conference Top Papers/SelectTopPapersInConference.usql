@@ -32,9 +32,10 @@ DECLARE @conferenceTopPapersFromLastYearOutPath string = @outputBaseDir + "confe
 //Get all conference papers by conference series Id.
 @conferencePapers =
     SELECT Paper.PaperId,
-           Paper.EstimatedCitationCount,
            Paper.OriginalTitle,
            Paper.Year,
+           Paper.CitationCount,
+           Paper.EstimatedCitationCount, //Will use estimated citation count to select top papers
            Paper.ConferenceSeriesId AS VenueId
     FROM Paper
          INNER JOIN
@@ -44,8 +45,10 @@ DECLARE @conferenceTopPapersFromLastYearOutPath string = @outputBaseDir + "confe
 
 //Select top conference papers based on estimated citation count
 @conferenceTopPapers =
-    SELECT  + @conferencePapers.PaperId AS DetailsUrl, //Microsoft Academic's entity detail page for given entity id
+    SELECT @maDetailPagePrefix + @conferencePapers.PaperId AS DetailsUrl, //Microsoft Academic's entity detail page for given entity id
            @conferencePapers.OriginalTitle,
+           @conferencePapers.Year,
+           @conferencePapers.CitationCount,
            @conferencePapers.EstimatedCitationCount
     FROM @conferencePapers
 ORDER BY  @conferencePapers.EstimatedCitationCount DESC
@@ -54,20 +57,4 @@ FETCH @conferenceTopPapersCount ROWS;
 
 OUTPUT @conferenceTopPapers
 TO @conferenceTopPapersOutPath
-USING Outputters.Tsv(outputHeader : true);
-
-
-//Select top conference papers from last year based on citation count
-@conferenceTopPapersFromLastYear =
-    SELECT @maDetailPagePrefix + @conferencePapers.PaperId AS DetailsUrl,
-           @conferencePapers.OriginalTitle,
-           @conferencePapers.EstimatedCitationCount
-    FROM @conferencePapers
-    WHERE @conferencePapers.Year == @lastYear
-ORDER BY @conferencePapers.EstimatedCitationCount DESC
-FETCH @conferenceTopPapersCount ROWS;
-
-
-OUTPUT @conferenceTopPapersFromLastYear
-TO @conferenceTopPapersFromLastYearOutPath
 USING Outputters.Tsv(outputHeader : true);

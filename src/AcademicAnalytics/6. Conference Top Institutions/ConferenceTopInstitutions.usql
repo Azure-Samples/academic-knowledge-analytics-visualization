@@ -49,10 +49,10 @@ DECLARE @conferenceTopInstitutionsOutPath string = @outputBaseDir + "conferenceT
 
 //Get all distinct [conference paper] -> [affiliation] relationships
 @conferenceAffiliationsPapers =
-    SELECT Affiliation.DisplayName AS InstitutionName,
+    SELECT ANY_VALUE(Affiliation.DisplayName) AS InstitutionName,
            Affiliation.AffiliationId,
            @conferencePapers.PaperId,
-           @conferencePapers.CitationCount
+           ANY_VALUE(@conferencePapers.CitationCount) AS CitationCount
     FROM @conferencePapers
          INNER JOIN
              @paperAffiliation
@@ -62,7 +62,7 @@ DECLARE @conferenceTopInstitutionsOutPath string = @outputBaseDir + "conferenceT
          ON @paperAffiliation.AffiliationId == Affiliation.AffiliationId
     //Each paper may have mutiple authors from the same institution.
     //We want to have distinct [conference paper] -> [affiliation] relationships so we don't double count
-    GROUP BY PaperId, AffiliationId;
+    GROUP BY @conferencePapers.PaperId, Affiliation.AffiliationId;
 
 
 //Get top institution by its all time citation count
