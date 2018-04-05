@@ -15,7 +15,7 @@ This script illustrates how to find top conference authors based on citation cou
 
 #### Input Parameters
 
-The script have the below parameters
+The script has the below parameters
 
 | Parameter Name |  Type  |                  Description                  |
 |----------------|--------|-----------------------------------------------|

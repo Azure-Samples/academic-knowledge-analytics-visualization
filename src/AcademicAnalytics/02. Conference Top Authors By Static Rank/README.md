@@ -15,7 +15,7 @@ This script illustrates how to aggregate static rank for authors and rank them i
 
 #### Input Parameters
 
-The script have the below parameters
+The script has the below parameters
 
 | Parameter Name |  Type  |                  Description                  |
 |----------------|--------|-----------------------------------------------|

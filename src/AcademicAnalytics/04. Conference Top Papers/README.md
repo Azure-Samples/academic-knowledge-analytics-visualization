@@ -14,7 +14,7 @@ This script illustrates how to find top papers based on estimated citation count
 
 #### Input Parameters
 
-The script have the below parameters
+The script has the below parameters
 
 | Parameter Name |  Type  |                  Description                  |
 |----------------|--------|-----------------------------------------------|

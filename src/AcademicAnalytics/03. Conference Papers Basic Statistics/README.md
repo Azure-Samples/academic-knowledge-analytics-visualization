@@ -15,7 +15,7 @@ This script illustrates how to aggregate publication count, average citation cou
 
 #### Input Parameters
 
-The script have the below parameters
+The script has the below parameters
 
 | Parameter Name |  Type  |                  Description                  |
 |----------------|--------|-----------------------------------------------|
