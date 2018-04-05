@@ -1,9 +1,10 @@
 # Conference Top Institutions
 
+This sample code illustrates how to find top institutions for a particular conference series using USQL and visualize the results with Power BI.
+
 ![](/images/PBIConferenceTopInstitutionsTable(WWW).png "WWW top institutions table") 
 ![](/images/PBIConferenceTopInstitutionsScatterChart(WWW).png "WWW institutions scatter chart")
 
-This sample code illustrates how to find top institutions for a particular conference series using USQL and visualize the results with Power BI.
 
 ## Getting started
 

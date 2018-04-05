@@ -1,10 +1,10 @@
 # Conference Papers Basic Statistics
 
+This sample code illustrates how to calculate basic paper statistics for a particular conference series using USQL and visualize the results with Power BI.
+
 ![](/images/PBIConferencePaperCount(WWW).png "WWW paper count")
 ![](/images/PBIConferenceReferenceCitationCount(WWW).png "WWW paper count")
 
-
-This sample code illustrates how to calculate basic paper statistics for a particular conference series using USQL and visualize the results with Power BI.
 
 ## Getting started
 

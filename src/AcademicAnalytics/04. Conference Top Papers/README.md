@@ -1,9 +1,9 @@
 # Conference Top Papers
 
+This sample code illustrates how to find top papers for a particular conference series using USQL and visualize the results with Power BI.
+
 ![](/images/PBIConferenceTopPapers(WWW).png "WWW top papers")
 
-
-This sample code illustrates how to find top papers for a particular conference series using USQL and visualize the results with Power BI.
 
 ## Getting started
 

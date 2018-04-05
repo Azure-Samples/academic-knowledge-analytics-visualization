@@ -1,10 +1,11 @@
 # Conference Top Authors
 
+This sample code illustrates how to find top authors for a particular conference series using USQL and visualize the results with Power BI.
+
 ![](/images/PBIConferenceTopAuthorsScatterChart(WWW).png "WWW top authors scatter chart") 
 ![](/images/PBIConferenceTopAuthorsYearHeatmap(WWW).png "WWW top authors citation year heatmap")
 ![](/images/PBIConferenceTopAuthorsTable(WWW).png "WWW top authors table")
 
-This sample code illustrates how to find top authors for a particular conference series using USQL and visualize the results with Power BI.
 
 ## Getting started
 
