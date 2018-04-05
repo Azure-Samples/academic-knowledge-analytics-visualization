@@ -1,0 +1,284 @@
+﻿// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
+
+DECLARE @GraphVersion string = "2018-03-06";
+DECLARE @GraphDir   string = "/graph/" + @GraphVersion + "/";
+DECLARE @pathAffiliations string = @GraphDir + "Affiliations.txt";
+DECLARE @GraphDBName string = "GraphDB-" + @GraphVersion;
+
+
+DROP DATABASE IF EXISTS AcdemicGraph; 
+CREATE DATABASE AcdemicGraph;
+USE DATABASE AcdemicGraph;
+
+
+CREATE TABLE Affiliation
+(
+    INDEX af_indx
+    CLUSTERED(AffiliationId)
+    DISTRIBUTED BY
+    HASH(AffiliationId)
+)AS
+EXTRACT AffiliationId long,
+        Rank uint,
+        NormalizedName string,
+        DisplayName string,
+        PaperCount int?,
+        CitationCount int?
+FROM @pathAffiliations
+USING Extractors.Tsv(silent : true, quoting : false);
+
+
+DECLARE @pathAuthors string = @GraphDir + "Authors.txt";
+CREATE TABLE Author
+(
+    INDEX au_idx
+    CLUSTERED(AuthorId)
+    DISTRIBUTED BY
+    HASH(AuthorId)
+) AS
+EXTRACT AuthorId long,
+        Rank uint,
+        NormalizedName string,
+        DisplayName string,
+        LastKnownAffiliationId long?,
+        PaperCount int?,
+        CitationCount int?
+FROM @pathAuthors
+USING Extractors.Tsv(silent : true, quoting : false);
+
+
+
+DECLARE @pathConferenceInstances string = @GraphDir + "ConferenceInstances.txt";
+CREATE TABLE ConferenceInstance
+(
+    INDEX ci_idx
+    CLUSTERED(ConferenceInstanceId)
+    DISTRIBUTED BY
+    HASH(ConferenceInstanceId)
+) AS
+EXTRACT ConferenceInstanceId long,
+        Rank uint,
+        NormalizedName string,
+        DisplayName string,
+        ConferenceSeriesId long?,
+        Location string,
+        OfficialUrl string,
+        StartDate DateTime?,
+        EndDate DateTime?,
+        AbstractRegistrationDate DateTime?,
+        SubmissionDeadlineDate DateTime?,
+        NotificationDueDate DateTime?,
+        FinalVersionDueDate DateTime?,
+        PaperCount int?,
+        CitationCount int?
+FROM @pathConferenceInstances
+USING Extractors.Tsv(silent : true, quoting : false);
+
+
+DECLARE @pathConferenceSeries string = @GraphDir + "ConferenceSeries.txt";
+CREATE TABLE ConferenceSeries
+(
+    INDEX cs_idx
+    CLUSTERED(ConferenceSeriesId)
+    DISTRIBUTED BY
+    HASH(ConferenceSeriesId)
+) AS
+EXTRACT ConferenceSeriesId long,
+        Rank uint,
+        NormalizedName string,
+        DisplayName string,
+        PaperCount int?,
+        CitationCount int?
+FROM @pathConferenceSeries
+USING Extractors.Tsv(silent : true, quoting : false);
+
+
+
+DECLARE @pathFieldsOfStudy string = @GraphDir + "FieldsOfStudy.txt";
+CREATE TABLE FieldOfStudy
+(
+    INDEX f_idx
+    CLUSTERED(FieldOfStudyId)
+    DISTRIBUTED BY
+    HASH(FieldOfStudyId)
+) AS
+EXTRACT FieldOfStudyId long,
+        Rank uint,
+        NormalizedName string,
+        DisplayName string,
+        Level int,
+        PaperCount int?,
+        CitationCount int?
+FROM @pathFieldsOfStudy
+USING Extractors.Tsv(silent : true, quoting : false);
+
+
+DECLARE @pathFieldOfStudyChildren string = @GraphDir + "FieldOfStudyChildren.txt";
+CREATE TABLE FieldOfStudyChildren
+(
+    INDEX fc_idx
+    CLUSTERED(FieldOfStudyId, ChildFieldOfStudyId)
+    DISTRIBUTED BY
+    HASH(FieldOfStudyId, ChildFieldOfStudyId)
+) AS
+EXTRACT FieldOfStudyId long,
+        ChildFieldOfStudyId long
+FROM @pathFieldOfStudyChildren
+USING Extractors.Tsv(silent : true, quoting : false);
+
+
+DECLARE @pathJournals string = @GraphDir + "Journals.txt";
+CREATE TABLE Journal
+(
+    INDEX j_idx
+    CLUSTERED(JournalId)
+    DISTRIBUTED BY
+    HASH(JournalId)
+) AS
+EXTRACT JournalId long,
+        Rank uint,
+        NormalizedName string,
+        DisplayName string,
+        PaperCount int?,
+        CitationCount int?
+FROM @pathJournals
+USING Extractors.Tsv(silent : true, quoting : false);
+
+
+
+DECLARE @pathPapers string = @GraphDir + "Papers.txt";
+CREATE TABLE Paper
+(
+    INDEX p_idx
+    CLUSTERED(PaperId)
+    DISTRIBUTED BY
+    HASH(PaperId)
+) AS
+EXTRACT PaperId long,
+        Rank uint,
+        Doi string,
+        DocType string,
+        PaperTitle string,
+        OriginalTitle string,
+        BookTitle string,
+        Year int,
+        Date DateTime?,
+        Publisher string,
+        JournalId long?,
+        ConferenceSeriesId long?,
+        ConferenceInstanceId long?,
+        Volume string,
+        Issue string,
+        FirstPage string,
+        LastPage string,
+        ReferenceCount int,
+        CitationCount int?,
+        EstimatedCitationCount int?
+FROM @pathPapers
+USING Extractors.Tsv(silent : true, quoting : false);
+
+
+
+DECLARE @pathPaperAbstractsInvertedIndex string = @GraphDir + "PaperAbstractsInvertedIndex.txt";
+CREATE TABLE PaperAbstractInvertedIndex
+(
+    INDEX pa_idx
+    CLUSTERED(PaperId)
+    DISTRIBUTED BY
+    HASH(PaperId)
+) AS
+EXTRACT PaperId long,
+        IndexedAbstract string
+FROM @pathPaperAbstractsInvertedIndex
+USING Extractors.Tsv(silent : true, quoting : false);
+
+
+
+DECLARE @pathPaperAuthorAffiliations string = @GraphDir + "PaperAuthorAffiliations.txt";
+CREATE TABLE PaperAuthorAffiliation
+(
+    INDEX paa_idx
+    CLUSTERED(PaperId, AuthorId, AffiliationId)
+    DISTRIBUTED BY
+    HASH(PaperId, AuthorId, AffiliationId)
+) AS
+EXTRACT PaperId long,
+        AuthorId long,
+        AffiliationId long?,
+        AuthorSequenceNumber uint
+FROM @pathPaperAuthorAffiliations
+USING Extractors.Tsv(silent : true, quoting : false);
+
+
+DECLARE @pathPaperCitationContexts string = @GraphDir + "PaperCitationContexts.txt";
+CREATE TABLE PaperCitationContext
+(
+    INDEX pc_idx
+    CLUSTERED(PaperId, PaperReferenceId)
+    DISTRIBUTED BY
+    HASH(PaperId, PaperReferenceId)
+) AS
+EXTRACT PaperId long,
+        PaperReferenceId long,
+        CitationContext string
+FROM @pathPaperCitationContexts
+USING Extractors.Tsv(silent : true, quoting : false);
+
+DECLARE @pathPaperFieldsOfStudy string = @GraphDir + "PaperFieldsOfStudy.txt";
+CREATE TABLE PaperFieldOfStudy
+(
+    INDEX pfos_idx
+    CLUSTERED(PaperId, FieldOfStudyId)
+    DISTRIBUTED BY
+    HASH(PaperId, FieldOfStudyId)
+) AS
+EXTRACT PaperId long,
+        FieldOfStudyId long,
+        Similarity float
+FROM @pathPaperFieldsOfStudy
+USING Extractors.Tsv(silent : true, quoting : false);
+
+
+DECLARE @pathPaperLanguages string = @GraphDir + "PaperLanguages.txt";
+CREATE TABLE PaperLanguage
+(
+    INDEX pl_idx
+    CLUSTERED(PaperId)
+    DISTRIBUTED BY
+    HASH(PaperId)
+) AS
+EXTRACT PaperId long,
+        LanguageCode string
+FROM @pathPaperLanguages
+USING Extractors.Tsv(silent : true, quoting : false);
+
+
+DECLARE @pathPaperReferences string = @GraphDir + "PaperReferences.txt";
+CREATE TABLE PaperReference
+(
+    INDEX pr_idx
+    CLUSTERED(PaperId, PaperReferenceId)
+    DISTRIBUTED BY
+    HASH(PaperId)
+) AS
+EXTRACT PaperId long,
+        PaperReferenceId long
+FROM @pathPaperReferences
+USING Extractors.Tsv(silent : true, quoting : false);
+
+
+DECLARE @pathPaperUrls string = @GraphDir + "PaperUrls.txt";
+CREATE TABLE PaperUrl
+(
+    INDEX purl_idx
+    CLUSTERED(PaperId)
+    DISTRIBUTED BY
+    HASH(PaperId)
+) AS
+EXTRACT PaperId long,
+        SourceType int?,
+        SourceUrl string
+FROM @pathPaperUrls
+USING Extractors.Tsv(silent : true, quoting : false);
+

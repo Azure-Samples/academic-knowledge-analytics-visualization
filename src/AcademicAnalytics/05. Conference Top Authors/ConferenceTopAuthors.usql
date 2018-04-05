@@ -1,0 +1,157 @@
+﻿// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
+
+//Make sure to run CreateDatabase script from common scripts first!
+USE DATABASE AcdemicGraph;
+
+//*******************Input Variable Section********************************
+//        Change these variables for different calculations
+//*************************************************************************
+DECLARE @conferenceShortName string = "WWW"; //Conference abbreviated name 
+DECLARE @conferenceTopAuthorsCount int = 20;  //Number of top authors to output
+DECLARE @conferenceMostCitedAuthorsCount int = 20;  //Number of most cited authors to output
+
+//*******************Constant Variable Section*****************************
+//        Defining const variables to be used by other parts of the script
+//*************************************************************************
+//This output path pattern is hardcoded to the pbi file. If this is changed, the pbi file needs to be modified as well
+DECLARE @conferenceAnalyticsBaseDir string = @"/output/conferenceAnalytics/";
+DECLARE @outputBaseDir string = @conferenceAnalyticsBaseDir + @conferenceShortName + "/";
+DECLARE @maDetailPagePrefix = @"https://academic.microsoft.com/#/detail/";
+
+//*************************Ouptut Section**********************************
+//                 All output files for this script.
+//*************************************************************************
+DECLARE @conferenceTopAuthorsOutPath string = @outputBaseDir + "conferenceTopAuthors.tsv";
+DECLARE @conferenceMostCitedAuthorsOutPath string = @outputBaseDir + "conferenceMostCitedAuthors.tsv";
+DECLARE @conferenceCitedAuthorsByYearOutPath string = @outputBaseDir + "conferenceCitedAuthorsByYear.tsv";
+
+
+
+
+//First find the conference series id by matching conference short name.
+@targetConferenceSeriesId =
+    SELECT (long?) ConferenceSeriesId AS ConferenceSeriesId //Cast long to long? to join against Paper table
+    FROM ConferenceSeries
+    WHERE NormalizedName == @conferenceShortName;
+
+
+//Get all conference papers by conference series Id.
+@conferencePapers =
+    SELECT Paper.PaperId,
+           Paper.CitationCount,
+           Paper.OriginalTitle,
+           Paper.Year,
+           Paper.ConferenceSeriesId AS VenueId
+    FROM Paper
+         INNER JOIN
+             @targetConferenceSeriesId
+         ON Paper.ConferenceSeriesId == @targetConferenceSeriesId.ConferenceSeriesId;
+
+
+//Get all [conference paper] -> [conference author] relationships
+@conferenceAuthorsPapers =
+    SELECT Author.DisplayName AS AuthorName,
+           Author.AuthorId,
+           @conferencePapers.PaperId,
+           @conferencePapers.CitationCount
+    FROM @conferencePapers
+         INNER JOIN
+             PaperAuthorAffiliation
+         ON @conferencePapers.PaperId == PaperAuthorAffiliation.PaperId
+         INNER JOIN
+             Author
+         ON PaperAuthorAffiliation.AuthorId == Author.AuthorId;
+
+
+//Aggregate citation and publication count for each author
+@conferenceTopAuthors =
+    SELECT ANY_VALUE(@conferenceAuthorsPapers.AuthorName) AS AuthorName, //Guaranteed to have only 1 value since AuthorId is the key
+           @maDetailPagePrefix + @conferenceAuthorsPapers.AuthorId AS DetailsUrl,
+           COUNT( * ) AS PublicationCount,
+           SUM(@conferenceAuthorsPapers.CitationCount) AS CitationCount
+    FROM @conferenceAuthorsPapers
+    GROUP BY @conferenceAuthorsPapers.AuthorId
+    ORDER BY CitationCount DESC
+    FETCH @conferenceTopAuthorsCount ROWS; //Only take top @conferenceTopAuthorsCount authors by citation count
+
+
+//Create two ranks based on publication and citation to display on the x and y axis for comparison
+@conferenceTopAuthors = 
+    SELECT @conferenceTopAuthors.AuthorName,
+           @conferenceTopAuthors.DetailsUrl,
+           @conferenceTopAuthors.PublicationCount,
+           @conferenceTopAuthors.CitationCount,
+           RANK() OVER(ORDER BY @conferenceTopAuthors.CitationCount DESC) AS AuthorCitationRank,
+           RANK() OVER(ORDER BY @conferenceTopAuthors.PublicationCount DESC) AS AuthorPublicationRank
+    FROM @conferenceTopAuthors;
+ 
+OUTPUT @conferenceTopAuthors
+TO @conferenceTopAuthorsOutPath
+USING Outputters.Tsv(outputHeader : true);   
+
+
+//Get all reference from [conference Paper] -> [referenced paper]
+@conferencePaperReferences =
+    SELECT @conferencePapers.PaperId,
+           @conferencePapers.Year,
+           Paper.PaperId AS ReferenceId
+    FROM Paper
+         INNER JOIN
+             PaperReference
+         ON Paper.PaperId == PaperReference.PaperReferenceId
+         INNER JOIN
+             @conferencePapers
+         ON PaperReference.PaperId == @conferencePapers.PaperId;
+
+//Get all conference paper -> paper -> author relationships to find most cited authors
+@conferenceCitedAuthorsPapers =
+    SELECT @conferencePaperReferences.PaperId,
+           @conferencePaperReferences.Year,
+           Author.DisplayName AS AuthorName,
+           Author.AuthorId,
+           @conferencePaperReferences.ReferenceId
+    FROM @conferencePaperReferences
+         INNER JOIN
+             PaperAuthorAffiliation
+         ON @conferencePaperReferences.ReferenceId == PaperAuthorAffiliation.PaperId
+         INNER JOIN
+             Author
+         ON PaperAuthorAffiliation.AuthorId == Author.AuthorId;
+
+
+//Aggregate publication and citation count for each author cited by conference paper
+@conferenceMostCitedAuthors =
+    SELECT ANY_VALUE(@conferenceCitedAuthorsPapers.AuthorName) AS AuthorName,
+           @conferenceCitedAuthorsPapers.AuthorId,
+           @maDetailPagePrefix + @conferenceCitedAuthorsPapers.AuthorId AS DetailsUrl,
+           //Count distinct since one paper can be cited by mutiple conference papers
+           COUNT(DISTINCT @conferenceCitedAuthorsPapers.ReferenceId) AS PublicationCount,
+           COUNT( * ) AS CitationCount
+    FROM @conferenceCitedAuthorsPapers
+    GROUP BY AuthorId
+    ORDER BY CitationCount DESC
+    FETCH @conferenceMostCitedAuthorsCount ROWS; //Only take top @conferenceMostCitedAuthorsCount authors by citation count
+
+
+OUTPUT @conferenceMostCitedAuthors
+TO @conferenceMostCitedAuthorsOutPath
+USING Outputters.Tsv(outputHeader : true);
+
+
+//Aggregate yearly citation recieved from conference papers for most cited authors
+@conferenceCitedAuthorsByYear =
+    SELECT @conferenceCitedAuthorsPapers.AuthorId,
+           @conferenceCitedAuthorsPapers.Year,
+           COUNT( * ) AS CitationCount
+    FROM @conferenceCitedAuthorsPapers
+         INNER JOIN
+             @conferenceMostCitedAuthors
+         ON @conferenceCitedAuthorsPapers.AuthorId == @conferenceMostCitedAuthors.AuthorId //We only want to generate yearly citation for the top authors
+    GROUP BY @conferenceCitedAuthorsPapers.AuthorId,
+             Year;
+
+
+OUTPUT @conferenceCitedAuthorsByYear
+TO @conferenceCitedAuthorsByYearOutPath
+USING Outputters.Tsv(outputHeader : true);

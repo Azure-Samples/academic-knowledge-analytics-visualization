@@ -20,93 +20,123 @@
     <OutputPath>bin\Release\</OutputPath>
   </PropertyGroup>
   <ItemGroup>
-    <Script Include="0. Common Scripts\CreateDatabase.usql" />
-    <Script Include="1. Field Top Authors\AggregateAuthorStatsInField.usql" />
-    <Script Include="2. Conference Top Authors By Static Rank\AuthorRankInConference.usql" />
-    <Script Include="3. Conference Papers Basic Statistics\PaperYearlyStatisticsInConference.usql" />
-    <Script Include="4. Conference Top Papers\SelectTopPapersInConference.usql" />
-    <Script Include="5. Conference Top Authors\ConferenceTopAuthors.usql" />
-    <Script Include="6. Conference Top Institutions\ConferenceTopInstitutions.usql" />
-    <Script Include="7. Conference Memory of References\AggregateConferenceReferencesByYear.usql" />
-    <Script Include="8. Conference Top Referenced Venues\AggregateConferenceReferencesByYearAndVenue.usql" />
-    <Script Include="9. Conference Top Cited Venues\AggregateConferenceCitationsByYearAndVenue.usql" />
-    <Script Include="11. Conference Hot Topics\ConferenceFieldsOfStudyByHotness.usql" />
-    <ScriptCode Include="0. Common Scripts\CreateDatabase.usql.cs">
-      <DependentUpon>0. Common Scripts\CreateDatabase.usql</DependentUpon>
+    <Script Include="00. Common Scripts\CreateDatabase.usql" />
+    <Script Include="01. Field of Study Top Authors\AggregateAuthorStatsInField.usql" />
+    <Script Include="02. Conference Top Authors By Static Rank\AuthorRankInConference.usql" />
+    <Script Include="03. Conference Papers Basic Statistics\PaperYearlyStatisticsInConference.usql" />
+    <Script Include="04. Conference Top Papers\SelectTopPapersInConference.usql" />
+    <Script Include="05. Conference Top Authors\ConferenceTopAuthors.usql" />
+    <Script Include="06. Conference Top Institutions\ConferenceTopInstitutions.usql" />
+    <Script Include="07. Conference Memory of References\AggregateConferenceReferencesByYear.usql" />
+    <Script Include="08. Conference Top Referenced Venues\AggregateConferenceReferencesByYearAndVenue.usql" />
+    <Script Include="09. Conference Top Cited Venues\AggregateConferenceCitationsByYearAndVenue.usql" />
+    <Script Include="10. Conference Hot Topics\ConferenceFieldsOfStudyByHotness.usql" />
+    <ScriptCode Include="00. Common Scripts\CreateDatabase.usql.cs">
+      <DependentUpon>00. Common Scripts\CreateDatabase.usql</DependentUpon>
     </ScriptCode>
-    <ScriptCode Include="1. Field Top Authors\AggregateAuthorStatsInField.usql.cs">
-      <DependentUpon>1. Field Top Authors\AggregateAuthorStatsInField.usql</DependentUpon>
+    <ScriptCode Include="01. Field of Study Top Authors\AggregateAuthorStatsInField.usql.cs">
+      <DependentUpon>01. Field of Study Top Authors\AggregateAuthorStatsInField.usql</DependentUpon>
     </ScriptCode>
-    <ScriptCode Include="2. Conference Top Authors By Static Rank\AuthorRankInConference.usql.cs">
-      <DependentUpon>2. Conference Top Authors By Static Rank\AuthorRankInConference.usql</DependentUpon>
+    <ScriptCode Include="02. Conference Top Authors By Static Rank\AuthorRankInConference.usql.cs">
+      <DependentUpon>02. Conference Top Authors By Static Rank\AuthorRankInConference.usql</DependentUpon>
     </ScriptCode>
-    <ScriptCode Include="3. Conference Papers Basic Statistics\PaperYearlyStatisticsInConference.usql.cs">
-      <DependentUpon>3. Conference Papers Basic Statistics\PaperYearlyStatisticsInConference.usql</DependentUpon>
+    <ScriptCode Include="03. Conference Papers Basic Statistics\PaperYearlyStatisticsInConference.usql.cs">
+      <DependentUpon>03. Conference Papers Basic Statistics\PaperYearlyStatisticsInConference.usql</DependentUpon>
     </ScriptCode>
-    <ScriptCode Include="4. Conference Top Papers\SelectTopPapersInConference.usql.cs">
-      <DependentUpon>4. Conference Top Papers\SelectTopPapersInConference.usql</DependentUpon>
+    <ScriptCode Include="04. Conference Top Papers\SelectTopPapersInConference.usql.cs">
+      <DependentUpon>04. Conference Top Papers\SelectTopPapersInConference.usql</DependentUpon>
     </ScriptCode>
-    <ScriptCode Include="5. Conference Top Authors\ConferenceTopAuthors.usql.cs">
-      <DependentUpon>5. Conference Top Authors\ConferenceTopAuthors.usql</DependentUpon>
+    <ScriptCode Include="05. Conference Top Authors\ConferenceTopAuthors.usql.cs">
+      <DependentUpon>05. Conference Top Authors\ConferenceTopAuthors.usql</DependentUpon>
     </ScriptCode>
-    <ScriptCode Include="6. Conference Top Institutions\ConferenceTopInstitutions.usql.cs">
-      <DependentUpon>6. Conference Top Institutions\ConferenceTopInstitutions.usql</DependentUpon>
+    <ScriptCode Include="06. Conference Top Institutions\ConferenceTopInstitutions.usql.cs">
+      <DependentUpon>06. Conference Top Institutions\ConferenceTopInstitutions.usql</DependentUpon>
     </ScriptCode>
-    <ScriptCode Include="7. Conference Memory of References\AggregateConferenceReferencesByYear.usql.cs">
-      <DependentUpon>7. Conference Memory of References\AggregateConferenceReferencesByYear.usql</DependentUpon>
+    <ScriptCode Include="07. Conference Memory of References\AggregateConferenceReferencesByYear.usql.cs">
+      <DependentUpon>07. Conference Memory of References\AggregateConferenceReferencesByYear.usql</DependentUpon>
     </ScriptCode>
-    <ScriptCode Include="8. Conference Top Referenced Venues\AggregateConferenceReferencesByYearAndVenue.usql.cs">
-      <DependentUpon>8. Conference Top Referenced Venues\AggregateConferenceReferencesByYearAndVenue.usql</DependentUpon>
+    <ScriptCode Include="08. Conference Top Referenced Venues\AggregateConferenceReferencesByYearAndVenue.usql.cs">
+      <DependentUpon>08. Conference Top Referenced Venues\AggregateConferenceReferencesByYearAndVenue.usql</DependentUpon>
     </ScriptCode>
-    <ScriptCode Include="9. Conference Top Cited Venues\AggregateConferenceCitationsByYearAndVenue.usql.cs">
-      <DependentUpon>9. Conference Top Cited Venues\AggregateConferenceCitationsByYearAndVenue.usql</DependentUpon>
+    <ScriptCode Include="09. Conference Top Cited Venues\AggregateConferenceCitationsByYearAndVenue.usql.cs">
+      <DependentUpon>09. Conference Top Cited Venues\AggregateConferenceCitationsByYearAndVenue.usql</DependentUpon>
     </ScriptCode>
-    <ScriptCode Include="11. Conference Hot Topics\ConferenceFieldsOfStudyByHotness.usql.cs">
-      <DependentUpon>11. Conference Hot Topics\ConferenceFieldsOfStudyByHotness.usql</DependentUpon>
+    <ScriptCode Include="10. Conference Hot Topics\ConferenceFieldsOfStudyByHotness.usql.cs">
+      <DependentUpon>10. Conference Hot Topics\ConferenceFieldsOfStudyByHotness.usql</DependentUpon>
     </ScriptCode>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="0. Common Scripts" />
-    <Folder Include="1. Field Top Authors" />
-    <Folder Include="2. Conference Top Authors By Static Rank" />
-    <Folder Include="3. Conference Papers Basic Statistics" />
-    <Folder Include="4. Conference Top Papers" />
-    <Folder Include="5. Conference Top Authors" />
-    <Folder Include="6. Conference Top Institutions" />
-    <Folder Include="7. Conference Memory of References" />
-    <Folder Include="8. Conference Top Referenced Venues" />
-    <Folder Include="9. Conference Top Cited Venues" />
-    <Folder Include="11. Conference Hot Topics" />
+    <Folder Include="00. Common Scripts" />
+    <Folder Include="01. Field of Study Top Authors" />
+    <Folder Include="02. Conference Top Authors By Static Rank" />
+    <Folder Include="03. Conference Papers Basic Statistics" />
+    <Folder Include="04. Conference Top Papers" />
+    <Folder Include="05. Conference Top Authors" />
+    <Folder Include="06. Conference Top Institutions" />
+    <Folder Include="07. Conference Memory of References" />
+    <Folder Include="08. Conference Top Referenced Venues" />
+    <Folder Include="09. Conference Top Cited Venues" />
+    <Folder Include="10. Conference Hot Topics" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="1. Field Top Authors\FieldTopAuthors.pbix">
+    <Content Include="01. Field of Study Top Authors\FieldTopAuthors.pbit">
       <SubType>Content</SubType>
     </Content>
-    <Content Include="2. Conference Top Authors By Static Rank\ConferenceTopAuthorsByStaticRank.pbix">
+    <Content Include="01. Field of Study Top Authors\FieldTopAuthors (Computer Science).pbix">
       <SubType>Content</SubType>
     </Content>
-    <Content Include="3. Conference Papers Basic Statistics\ConferencePapersStatistics.pbix">
+    <Content Include="02. Conference Top Authors By Static Rank\ConferenceTopAuthorsByStaticRank.pbit">
       <SubType>Content</SubType>
     </Content>
-    <Content Include="4. Conference Top Papers\ConferenceTopPapers.pbix">
+    <Content Include="02. Conference Top Authors By Static Rank\ConferenceTopAuthorsByStaticRank (WWW).pbix">
       <SubType>Content</SubType>
     </Content>
-    <Content Include="5. Conference Top Authors\ConferenceTopAuthors.pbix">
+    <Content Include="03. Conference Papers Basic Statistics\ConferencePapersStatistics.pbit">
       <SubType>Content</SubType>
     </Content>
-    <Content Include="6. Conference Top Institutions\ConferenceTopInstitutions.pbix">
+    <Content Include="03. Conference Papers Basic Statistics\ConferencePapersStatistics (WWW).pbix">
       <SubType>Content</SubType>
     </Content>
-    <Content Include="7. Conference Memory of References\ConferenceMemoryOfReferences.pbix">
+    <Content Include="04. Conference Top Papers\ConferenceTopPapers.pbit">
       <SubType>Content</SubType>
     </Content>
-    <Content Include="8. Conference Top Referenced Venues\ConferenceOutgoingReferences.pbix">
+    <Content Include="04. Conference Top Papers\ConferenceTopPapers (WWW).pbix">
       <SubType>Content</SubType>
     </Content>
-    <Content Include="9. Conference Top Cited Venues\ConferenceIncomingCitations.pbix">
+    <Content Include="05. Conference Top Authors\ConferenceTopAuthors.pbit">
       <SubType>Content</SubType>
     </Content>
-    <Content Include="11. Conference Hot Topics\ConferenceHotTopics.pbix">
+    <Content Include="05. Conference Top Authors\ConferenceTopAuthors (WWW).pbix">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="06. Conference Top Institutions\ConferenceTopInstitutions.pbit">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="06. Conference Top Institutions\ConferenceTopInstitutions (WWW).pbix">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="07. Conference Memory of References\ConferenceMemoryOfReferences.pbit">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="07. Conference Memory of References\ConferenceMemoryOfReferences (WWW).pbix">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="08. Conference Top Referenced Venues\ConferenceOutgoingReferences.pbit">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="08. Conference Top Referenced Venues\ConferenceOutgoingReferences (WWW).pbix">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="09. Conference Top Cited Venues\ConferenceIncomingCitations.pbit">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="09. Conference Top Cited Venues\ConferenceIncomingCitations (WWW).pbix">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="10. Conference Hot Topics\ConferenceHotTopics.pbit">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="10. Conference Hot Topics\ConferenceHotTopics (WWW).pbix">
       <SubType>Content</SubType>
     </Content>
   </ItemGroup>

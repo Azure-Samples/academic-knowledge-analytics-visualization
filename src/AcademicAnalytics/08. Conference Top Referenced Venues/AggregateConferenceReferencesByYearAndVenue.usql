@@ -1,0 +1,114 @@
+﻿// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
+
+//Make sure to run CreateDatabase script from common scripts first!
+USE DATABASE AcdemicGraph;
+
+//*******************Input Variable Section********************************
+//        Change these variables for different calculations
+//*************************************************************************
+DECLARE @conferenceShortName string = "WWW";  //Conference abbreviated name 
+
+//*******************Constant Variable Section*****************************
+//        Defining const variables to be used by other parts of the script
+//*************************************************************************
+//This output path pattern is hardcoded to the pbi file. If this is changed, the pbi file needs to be modified as well
+DECLARE @conferenceAnalyticsBaseDir string = @"/output/conferenceAnalytics/";
+DECLARE @outputBaseDir string = @conferenceAnalyticsBaseDir + @conferenceShortName + "/";
+
+//*************************Ouptut Section**********************************
+//                 All output files for this script.
+//*************************************************************************
+DECLARE @venueOutPath string =  @outputBaseDir + "venue.tsv";
+DECLARE @conferenceReferenceVenueOutPath string = @outputBaseDir + "conferenceReferenceVenue.tsv";
+DECLARE @conferenceYearlyReferenceVenueOutPath string = @outputBaseDir + "conferenceYearlyReferenceVenue.tsv";
+
+
+
+
+//The visualization can join against this table to get venue information. 
+//Since this isn't a large set of data, we can directly output it
+@venues =
+    SELECT ConferenceSeries.ConferenceSeriesId AS VenueId,
+           ConferenceSeries.NormalizedName AS VenueShortName,
+           ConferenceSeries.DisplayName AS VenueName
+    FROM ConferenceSeries
+    //All entity Ids should be distinct. (ConferenceSeriesId and JournalId won't collide) Using union all here for better performance          
+    UNION ALL
+    SELECT Journal.JournalId AS VenueId,
+           Journal.NormalizedName AS VenueShortName,
+           Journal.DisplayName AS VenueName
+    FROM Journal;
+
+
+OUTPUT @venues
+TO @venueOutPath
+USING Outputters.Tsv(outputHeader : true);
+
+
+//First find the conference series id by matching conference short name.
+@targetConferenceSeriesId =
+    SELECT (long?) ConferenceSeriesId AS ConferenceSeriesId //Cast long to long? to join against Paper table
+    FROM ConferenceSeries
+    WHERE NormalizedName == @conferenceShortName;
+
+
+//Get all conference papers by conference series Id.
+@conferencePapers =
+    SELECT Paper.PaperId,
+           Paper.Year,
+           Paper.ConferenceSeriesId AS VenueId
+    FROM Paper
+         INNER JOIN
+             @targetConferenceSeriesId
+         ON Paper.ConferenceSeriesId == @targetConferenceSeriesId.ConferenceSeriesId;
+ 
+ 
+//Get all reference from [Conference Paper] -> [Other Paper]
+@conferencePaperReferences =
+    SELECT @conferencePapers.PaperId,
+           @conferencePapers.Year,
+           @conferencePapers.VenueId,
+           Paper.PaperId AS ReferenceId,
+           //A single paper may be published in conference and in a journal later.
+           //Use conference as its venue if present otherwise, journal
+           Paper.ConferenceSeriesId == null ? JournalId : ConferenceSeriesId AS ReferenceVenueId
+    FROM Paper
+         INNER JOIN
+             PaperReference
+         ON Paper.PaperId == PaperReference.PaperReferenceId
+         INNER JOIN
+             @conferencePapers
+         ON PaperReference.PaperId == @conferencePapers.PaperId;
+
+
+//Count number of references between conference and referenced conference
+//Keep VenueId and ReferenceVenueId such that the visulization can join directly with Venue table to get venue names
+@conferencePaperReferenceByVenues =
+    SELECT @conferencePaperReferences.VenueId,
+           @conferencePaperReferences.ReferenceVenueId,
+           COUNT( * ) AS ReferenceCount
+    FROM @conferencePaperReferences
+    GROUP BY @conferencePaperReferences.VenueId,
+             @conferencePaperReferences.ReferenceVenueId;
+
+
+OUTPUT @conferencePaperReferenceByVenues
+TO @conferenceReferenceVenueOutPath
+USING Outputters.Tsv(outputHeader : true);
+
+
+//For each yeah of conference, count number of references between conference and referenced conference
+//Keep VenueId and ReferenceVenueId such that the visulization can join directly with Venue table to get venue names
+@conferencePaperReferenceByYearsReferenceVenues =
+    SELECT @conferencePaperReferences.Year,
+           @conferencePaperReferences.ReferenceVenueId,
+           COUNT( * ) AS ReferenceCount
+    FROM @conferencePaperReferences
+    GROUP BY @conferencePaperReferences.Year,
+             @conferencePaperReferences.ReferenceVenueId;
+
+
+OUTPUT @conferencePaperReferenceByYearsReferenceVenues
+TO @conferenceYearlyReferenceVenueOutPath
+USING Outputters.Tsv(outputHeader : true);
