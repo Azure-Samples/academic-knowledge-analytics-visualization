@@ -6,15 +6,17 @@ This project aims to help data scientists become familar with the Microsoft Acad
 
 The project contains 10 samples 
 
-* Field of Study Top Authors
+* [Field of Study Top Authors](/src/AcademicAnalytics/01.%20Field%20of%20Study%20Top%20Authors/README.md)
+* [Conference Top Authors By Static Rank](/src/AcademicAnalytics/02.%20Conference%20Top%20Authors%20By%20Static%Rank/README.md)
 * Conference Paper Statistics
-* Conference Top Authors By Static Rank
 * Conference Top Papers
 * Conference Top Authors
 * Conference Top Institutions
 * Conference Top Citing Venues
 * Conference Memory of References
 * Conference Hot Topics
+
+
 
 
 ## Getting Started
@@ -64,11 +66,11 @@ The project contains 10 samples
 
 
 #### Using Power BI 
-    - Make sure USQL script finished sucessfully
-    - Open up corresponding Power BI Template(.pbit) from file explorer (Visual studio doesn't recognize Power BI files) 
-    - Enter your ADL information and parameters corrisponding to your scripts
-    ![](/images/PBITemplateInitParam.png "Sample template load")
-    - Make sure the parameters cases are the same as your script and "click" to load
+- Make sure USQL script finished sucessfully
+- Open up corresponding Power BI Template(.pbit) from file explorer (Visual studio doesn't recognize Power BI files) 
+- Enter your ADL information and parameters corrisponding to your scripts
+![](/images/PBITemplateInitParam.png "Sample template load")
+- Make sure the parameters cases are the same as your script and "click" to load
 
 ## Resources
 

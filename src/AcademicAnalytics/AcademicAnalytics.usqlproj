@@ -85,10 +85,16 @@
     <Content Include="01. Field of Study Top Authors\FieldTopAuthors (Computer Science).pbix">
       <SubType>Content</SubType>
     </Content>
+    <Content Include="01. Field of Study Top Authors\README.md">
+      <SubType>Content</SubType>
+    </Content>
     <Content Include="02. Conference Top Authors By Static Rank\ConferenceTopAuthorsByStaticRank.pbit">
       <SubType>Content</SubType>
     </Content>
     <Content Include="02. Conference Top Authors By Static Rank\ConferenceTopAuthorsByStaticRank (WWW).pbix">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="02. Conference Top Authors By Static Rank\README.md">
       <SubType>Content</SubType>
     </Content>
     <Content Include="03. Conference Papers Basic Statistics\ConferencePapersStatistics.pbit">
