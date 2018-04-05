@@ -6,8 +6,8 @@ This project aims to help data scientists become familar with the Microsoft Acad
 
 The project contains 10 samples 
 
-* [Field of Study Top Authors](/src/AcademicAnalytics/01.%20Field%20of%20Study%20Top%20Authors/README.md)
-* [Conference Top Authors By Static Rank](/src/AcademicAnalytics/02.%20Conference%20Top%20Authors%20By%20Static%Rank/README.md)
+* [Field of Study Top Authors](/src/AcademicAnalytics/01.%20Field%20of%20Study%20Top%20Authors)
+* [Conference Top Authors By Static Rank](/src/AcademicAnalytics/02.%20Conference%20Top%20Authors%20By%20Static%20Rank)
 * Conference Paper Statistics
 * Conference Top Papers
 * Conference Top Authors

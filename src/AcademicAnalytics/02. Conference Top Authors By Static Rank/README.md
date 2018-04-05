@@ -26,6 +26,7 @@ The script have the below parameters
 The script should output one tsv with headers. Here's what to expect
 
 `conferenceTopAuthorsByStaticRank.tsv`
+
 | AuthorName | PublicationCount  | AuthorRank | AuthorNormalizedRank |
 |----------|-------------|---------------|------------------|
 |Wei-Ying Ma|   26   |    19      |     19         |

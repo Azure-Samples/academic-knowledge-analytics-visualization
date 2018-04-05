@@ -26,6 +26,7 @@ The script has the below parameters
 The script should output one tsv with headers. Here's what to expect
 
 `topAuthors.tsv`
+
 | AuthorId | AuthorName  | CitationCount | PublicationCount |
 |----------|-------------|---------------|------------------|
 |2125104194|Philips S. Yu|    50136      |     1048         |
