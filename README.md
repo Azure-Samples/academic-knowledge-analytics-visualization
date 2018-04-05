@@ -54,13 +54,24 @@ The project contains 10 samples
 
 - How to run
     - Make sure you have selected your ADLA account
+
+
     ![](/images/VSSelectADLAAccount.png "Select your ADLA Account in Visual Studio")
+
     - Build the script first to validate syntax
+
+
     ![](/images/VSBuildScript.png "Build USQL script in Visual Studio")
+
     - Submit your script to your ADLA account
+
+
     ![](/images/VSSubmitScript.png "Submit USCQL script in Visual Studio")
+
 - How to view the results
     - You can view the results via azure portal
+
+    
     ![](/images/ADLADataExplorer.png "Azure Data lake Analyatics Data explorer")
     ![](/images/ADLADataExplorer2.png "Azure Data lake Analyatics Data explorer2")
 

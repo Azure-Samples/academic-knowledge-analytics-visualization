@@ -3,7 +3,9 @@
 
 This sample code illustrates how to find top authors in a particular field of study by citation count using USQL and make the result interactive with Power BI.
 
+
 ![](/images/PBIFieldOfStudyTopAuthors(WWW).png "Computer science top authors")
+
 
 ## Getting started
 

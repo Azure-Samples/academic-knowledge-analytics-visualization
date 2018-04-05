@@ -2,7 +2,9 @@
 
 This sample code illustrates how to find top authors in a particular conference series by paper static rank using USQL and visualize the results with Power BI.
 
+
 ![](/images/PBIConferenceTopAuthorsByStaticRank(WWW).png "Computer science top authors")
+
 
 ## Getting started
 
