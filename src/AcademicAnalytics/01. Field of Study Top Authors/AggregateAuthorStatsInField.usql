@@ -1,0 +1,79 @@
+﻿// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
+
+//Make sure to run CreateDatabase script from common scripts first!
+USE DATABASE AcdemicGraph;
+
+//*******************Input Variable Section********************************
+//        Change these variables for different calculations
+//*************************************************************************
+DECLARE @fieldName string = "computer science";
+DECLARE @fieldTopAuthorsCount int = 100;  //Number of top authors to output
+//
+//*******************Constant Variable Section*****************************
+//        Defining const variables to be used by other parts of the script
+//*************************************************************************
+//This output path pattern is hardcoded to the pbi file. If this is changed, the pbi file needs to be modified as well
+DECLARE @fieldAnalyticsBaseDir string = @"/output/fieldAnalytics/";
+DECLARE @outputBaseDir string = @fieldAnalyticsBaseDir + Uri.EscapeUriString(@fieldName) + "/"; //Uri encode the field name since there may be spaces
+
+//*************************Ouptut Section**********************************
+//                 All output files for this script.
+//*************************************************************************
+DECLARE @fieldTopAuthorsOutPath string = @outputBaseDir + @"topAuthors.tsv";
+
+
+
+
+//Get all paperIds for the field
+@fieldPaperIds =
+    SELECT PaperFieldOfStudy.PaperId
+    FROM FieldOfStudy
+         INNER JOIN
+             PaperFieldOfStudy
+         ON FieldOfStudy.FieldOfStudyId == PaperFieldOfStudy.FieldOfStudyId
+    WHERE FieldOfStudy.NormalizedName == @fieldName;
+
+
+//Get all [citing paper] -> [field paper] relationships
+@fieldCitations =
+    SELECT PaperReference.PaperId,
+           PaperReference.PaperReferenceId 
+    FROM PaperReference
+         INNER JOIN
+             @fieldPaperIds
+         ON @fieldPaperIds.PaperId == PaperReference.PaperReferenceId;
+
+
+//For each field paper, count incoming reference to get citation count
+@fieldPapersWithCitationCount =
+    SELECT @fieldCitations.PaperReferenceId AS PaperId,
+           COUNT( * ) AS CitationCount
+    FROM @fieldCitations
+    GROUP BY @fieldCitations.PaperReferenceId;
+
+
+//Get top authors by citation count
+@fieldAuthors =
+    SELECT Author.AuthorId,
+           ANY_VALUE(Author.DisplayName) AS AuthorName, //Guaranteed to have only 1 value since AuthorId is the key
+           COUNT( @fieldPapersWithCitationCount.PaperId ) AS PublicationCount,
+           SUM(@fieldPapersWithCitationCount.CitationCount) AS CitationCount
+    FROM @fieldPapersWithCitationCount
+         //First join against PaperAuthorAffiliation to get field paper -> field author relationship.
+         JOIN
+             PaperAuthorAffiliation
+         ON PaperAuthorAffiliation.PaperId == @fieldPapersWithCitationCount.PaperId
+         //Then join against Author to get detail author information.
+         JOIN
+            Author    
+         ON PaperAuthorAffiliation.AuthorId == Author.AuthorId
+    //Aggregate over authorId to cacluate publication/ciation count for each author
+    GROUP BY Author.AuthorId
+    ORDER BY CitationCount DESC
+    FETCH @fieldTopAuthorsCount ROWS;
+
+
+OUTPUT @fieldAuthors
+TO  @fieldTopAuthorsOutPath
+USING Outputters.Tsv(outputHeader:true);
