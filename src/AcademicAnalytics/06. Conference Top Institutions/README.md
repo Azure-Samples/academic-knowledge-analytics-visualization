@@ -25,7 +25,7 @@ The script has the below parameters
 
 #### Output Files
 
-The script should output three tsv with headers. Here's what to expect
+The script should output one tsv with headers. Here's what to expect
 
 `conferenceTopInstitutions.tsv`
 
@@ -51,9 +51,9 @@ The template visualizes the results using a table with data bars and scatter cha
 | Conference Short Name | string | Used for finding the correct path to files output by the script. This should be the same value as @conferenceShortName in the script for the template to load correctly. |
 
 
-### ConferencePapersStatistics (WWW).pbix
+### ConferenceTopInstitutions (WWW).pbix
 
-This Power BI report file is for comparison. If you run the script as is then use ConferencePapersStatistics.pbit to create a Power BI report, the visualization and interaction should be indentical. 
+This Power BI report file is for comparison. If you run the script as is then use ConferenceTopInstitutions.pbit to create a Power BI report, the visualization and interaction should be indentical. 
 
 ## Resources
 

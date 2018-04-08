@@ -12,8 +12,9 @@ The project contains 10 samples
 * [Conference Top Papers](/src/AcademicAnalytics/04.%20Conference%20Top%20Papers)
 * [Conference Top Authors](/src/AcademicAnalytics/05.%20Conference%20Top%20Authors)
 * [Conference Top Institutions](/src/AcademicAnalytics/06.%20Conference%20Top%20Institutions)
-* [Conference Top Citing Venues](/src/AcademicAnalytics/07.%20Conference%20Memory%20of%20References)
-* [Conference Memory of References](/src/AcademicAnalytics/09.%20Conference%20Top%20Cited%20Venues)
+* [Conference Memory of References](/src/AcademicAnalytics/07.%20Conference%20Memory%20of%20References)
+* [Conference Top Referenced Venues](/src/AcademicAnalytics/09.%20Conference%20Top%20Referenced%20Venues)
+* [Conference Top Citing Venues](/src/AcademicAnalytics/09.%20Conference%20Top%20Citing%20Venues)
 
 
 

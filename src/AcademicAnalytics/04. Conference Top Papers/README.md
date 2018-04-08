@@ -34,7 +34,7 @@ The script should output one tsv with headers. Here's what to expect
 | 1996 |       104         |         50.66346     |        5.49038458     |
 |....  |....               |....                  |....                   |
 
-### ConferencePapersStatistics.pbit
+### ConferenceTopPapers.pbit
 
 The template visualizes the results using a column chart and a clustered column chart to illustrate the relationship between publication count, average citation count, average reference count over time. 
 
@@ -45,9 +45,9 @@ The template visualizes the results using a column chart and a clustered column 
 | Conference Short Name | string | Used for finding the correct path to files output by the script. This should be the same value as @conferenceShortName in the script for the template to load correctly. |
 
 
-### ConferencePapersStatistics (WWW).pbix
+### ConferenceTopPapers (WWW).pbix
 
-This Power BI report file is for comparison. If you run the script as is then use ConferencePapersStatistics.pbit to create a Power BI report, the visualization and interaction should be indentical. 
+This Power BI report file is for comparison. If you run the script as is then use ConferenceTopPapers.pbit to create a Power BI report, the visualization and interaction should be indentical. 
 
 ## Resources
 

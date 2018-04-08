@@ -79,9 +79,9 @@ This allows matrix heatmap visual to display author name and enables filtering.
 
 ![](/images/PBIConferenceTopAuthorsFilter(WWW).png "Using a visual to filter other visuals")
 
-### ConferencePapersStatistics (WWW).pbix
+### ConferenceTopAuthors (WWW).pbix
 
-This Power BI report file is for comparison. If you run the script as is then use ConferencePapersStatistics.pbit to create a Power BI report, the visualization and interaction should be indentical. 
+This Power BI report file is for comparison. If you run the script as is then use ConferenceTopAuthors.pbit to create a Power BI report, the visualization and interaction should be indentical. 
 
 ## Resources
 
