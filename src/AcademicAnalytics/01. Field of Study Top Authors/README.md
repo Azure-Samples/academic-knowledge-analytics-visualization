@@ -15,7 +15,7 @@ This script illustrates how to aggregate stats for authors in a given field of s
 
 #### Input Parameters
 
-The script has the below parameters
+The script has the following parameters
 
 | Parameter Name |  Type  |                  Description                  |
 |----------------|--------|-----------------------------------------------|

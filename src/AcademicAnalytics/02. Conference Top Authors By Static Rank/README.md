@@ -15,7 +15,7 @@ This script illustrates how to aggregate static rank for authors and rank them i
 
 #### Input Parameters
 
-The script have the below parameters
+The script has the below parameters
 
 | Parameter Name |  Type  |                  Description                  |
 |----------------|--------|-----------------------------------------------|
@@ -49,7 +49,7 @@ We made the top right corner of the scatter chart the "ideal" corner for easier 
 ![](/images/PBISignFlipMeasure.png "flip sign using measure")
 
 
-### ConferenceTopAuthorsByStaticRank (Computer Science).pbix
+### ConferenceTopAuthorsByStaticRank (WWW).pbix
 
 This Power BI report file is for comparison. If you run the script as is then use ConferenceTopAuthorsByStaticRank.pbit to create a Power BI report, the visualization and interaction should be indentical. 
 

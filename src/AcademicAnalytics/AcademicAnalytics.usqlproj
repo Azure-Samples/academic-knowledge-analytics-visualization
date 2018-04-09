@@ -29,7 +29,7 @@
     <Script Include="06. Conference Top Institutions\ConferenceTopInstitutions.usql" />
     <Script Include="07. Conference Memory of References\AggregateConferenceReferencesByYear.usql" />
     <Script Include="08. Conference Top Referenced Venues\AggregateConferenceReferencesByYearAndVenue.usql" />
-    <Script Include="09. Conference Top Cited Venues\AggregateConferenceCitationsByYearAndVenue.usql" />
+    <Script Include="09. Conference Top Citing Venues\AggregateConferenceCitationsByYearAndVenue.usql" />
     <Script Include="10. Conference Hot Topics\ConferenceFieldsOfStudyByHotness.usql" />
     <ScriptCode Include="00. Common Scripts\CreateDatabase.usql.cs">
       <DependentUpon>00. Common Scripts\CreateDatabase.usql</DependentUpon>
@@ -58,8 +58,8 @@
     <ScriptCode Include="08. Conference Top Referenced Venues\AggregateConferenceReferencesByYearAndVenue.usql.cs">
       <DependentUpon>08. Conference Top Referenced Venues\AggregateConferenceReferencesByYearAndVenue.usql</DependentUpon>
     </ScriptCode>
-    <ScriptCode Include="09. Conference Top Cited Venues\AggregateConferenceCitationsByYearAndVenue.usql.cs">
-      <DependentUpon>09. Conference Top Cited Venues\AggregateConferenceCitationsByYearAndVenue.usql</DependentUpon>
+    <ScriptCode Include="09. Conference Top Citing Venues\AggregateConferenceCitationsByYearAndVenue.usql.cs">
+      <DependentUpon>09. Conference Top Citing Venues\AggregateConferenceCitationsByYearAndVenue.usql</DependentUpon>
     </ScriptCode>
     <ScriptCode Include="10. Conference Hot Topics\ConferenceFieldsOfStudyByHotness.usql.cs">
       <DependentUpon>10. Conference Hot Topics\ConferenceFieldsOfStudyByHotness.usql</DependentUpon>
@@ -75,10 +75,13 @@
     <Folder Include="06. Conference Top Institutions" />
     <Folder Include="07. Conference Memory of References" />
     <Folder Include="08. Conference Top Referenced Venues" />
-    <Folder Include="09. Conference Top Cited Venues" />
+    <Folder Include="09. Conference Top Citing Venues" />
     <Folder Include="10. Conference Hot Topics" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="00. Common Scripts\README.md">
+      <SubType>Content</SubType>
+    </Content>
     <Content Include="01. Field of Study Top Authors\FieldTopAuthors.pbit">
       <SubType>Content</SubType>
     </Content>
@@ -103,10 +106,16 @@
     <Content Include="03. Conference Papers Basic Statistics\ConferencePapersStatistics (WWW).pbix">
       <SubType>Content</SubType>
     </Content>
+    <Content Include="03. Conference Papers Basic Statistics\README.md">
+      <SubType>Content</SubType>
+    </Content>
     <Content Include="04. Conference Top Papers\ConferenceTopPapers.pbit">
       <SubType>Content</SubType>
     </Content>
     <Content Include="04. Conference Top Papers\ConferenceTopPapers (WWW).pbix">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="04. Conference Top Papers\README.md">
       <SubType>Content</SubType>
     </Content>
     <Content Include="05. Conference Top Authors\ConferenceTopAuthors.pbit">
@@ -115,10 +124,16 @@
     <Content Include="05. Conference Top Authors\ConferenceTopAuthors (WWW).pbix">
       <SubType>Content</SubType>
     </Content>
+    <Content Include="05. Conference Top Authors\README.md">
+      <SubType>Content</SubType>
+    </Content>
     <Content Include="06. Conference Top Institutions\ConferenceTopInstitutions.pbit">
       <SubType>Content</SubType>
     </Content>
     <Content Include="06. Conference Top Institutions\ConferenceTopInstitutions (WWW).pbix">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="06. Conference Top Institutions\README.md">
       <SubType>Content</SubType>
     </Content>
     <Content Include="07. Conference Memory of References\ConferenceMemoryOfReferences.pbit">
@@ -127,16 +142,25 @@
     <Content Include="07. Conference Memory of References\ConferenceMemoryOfReferences (WWW).pbix">
       <SubType>Content</SubType>
     </Content>
+    <Content Include="07. Conference Memory of References\README.md">
+      <SubType>Content</SubType>
+    </Content>
     <Content Include="08. Conference Top Referenced Venues\ConferenceOutgoingReferences.pbit">
       <SubType>Content</SubType>
     </Content>
     <Content Include="08. Conference Top Referenced Venues\ConferenceOutgoingReferences (WWW).pbix">
       <SubType>Content</SubType>
     </Content>
-    <Content Include="09. Conference Top Cited Venues\ConferenceIncomingCitations.pbit">
+    <Content Include="08. Conference Top Referenced Venues\README.md">
       <SubType>Content</SubType>
     </Content>
-    <Content Include="09. Conference Top Cited Venues\ConferenceIncomingCitations (WWW).pbix">
+    <Content Include="09. Conference Top Citing Venues\ConferenceIncomingCitations.pbit">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="09. Conference Top Citing Venues\ConferenceIncomingCitations (WWW).pbix">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="09. Conference Top Citing Venues\README.md">
       <SubType>Content</SubType>
     </Content>
     <Content Include="10. Conference Hot Topics\ConferenceHotTopics.pbit">

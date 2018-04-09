@@ -8,13 +8,13 @@ The project contains 10 samples
 
 * [Field of Study Top Authors](/src/AcademicAnalytics/01.%20Field%20of%20Study%20Top%20Authors)
 * [Conference Top Authors By Static Rank](/src/AcademicAnalytics/02.%20Conference%20Top%20Authors%20By%20Static%20Rank)
-* Conference Paper Statistics
-* Conference Top Papers
-* Conference Top Authors
-* Conference Top Institutions
-* Conference Top Citing Venues
-* Conference Memory of References
-* Conference Hot Topics
+* [Conference Paper Statistics](/src/AcademicAnalytics/03.%20Conference%20Papers%20Basic%20Statistics)
+* [Conference Top Papers](/src/AcademicAnalytics/04.%20Conference%20Top%20Papers)
+* [Conference Top Authors](/src/AcademicAnalytics/05.%20Conference%20Top%20Authors)
+* [Conference Top Institutions](/src/AcademicAnalytics/06.%20Conference%20Top%20Institutions)
+* [Conference Memory of References](/src/AcademicAnalytics/07.%20Conference%20Memory%20of%20References)
+* [Conference Top Referenced Venues](/src/AcademicAnalytics/09.%20Conference%20Top%20Referenced%20Venues)
+* [Conference Top Citing Venues](/src/AcademicAnalytics/09.%20Conference%20Top%20Citing%20Venues)
 
 
 
@@ -33,8 +33,6 @@ The project contains 10 samples
 - Visual Studio with Data lake tools 
     - Included in Visual Studio 2017 https://www.visualstudio.com/downloads/
     - Plug in for Visual Studio 2015 https://www.microsoft.com/en-us/download/details.aspx?id=49504
-
-
 
 
 
