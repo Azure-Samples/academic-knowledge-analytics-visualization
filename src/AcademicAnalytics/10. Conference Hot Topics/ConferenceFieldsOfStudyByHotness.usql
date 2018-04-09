@@ -8,7 +8,7 @@ USE DATABASE AcdemicGraph;
 //        Change these variables for different calculations
 //*************************************************************************
 DECLARE @conferenceShortName string = "WWW"; //Conference abbreviated name 
-DECLARE @confFieldHotnessStartYear int = 2012; //Settings for calculating fields of study hotness. 
+DECLARE @confFieldHotnessStartYear int = 2013; //Settings for calculating fields of study hotness. 
 
 //*******************Constant Variable Section*****************************
 //        Defining const variables to be used by other parts of the script
@@ -22,8 +22,8 @@ DECLARE @lastYear int = DateTime.Today.Year - 1;
 //*************************Ouptut Section**********************************
 //                 All output files for this script.
 //*************************************************************************
-DECLARE @conferenceFieldsOfStudyOutPath string = @"/output/conferenceAnalytics/" + @conferenceShortName+ "/conferenceFieldsOfStudy.tsv";
-DECLARE @conferenceFieldsOfStudyYearlyStatsOutPath string = @"/output/conferenceAnalytics/" + @conferenceShortName+ "/conferenceFieldsOfStudyYearlyStats.tsv";
+DECLARE @conferenceFieldsOfStudyOutPath string = @"/output/conferenceAnalytics/" + @conferenceShortName + "_new"  + "/conferenceFieldsOfStudy.tsv";
+DECLARE @conferenceFieldsOfStudyYearlyStatsOutPath string = @"/output/conferenceAnalytics/" + @conferenceShortName + "_new" + "/conferenceFieldsOfStudyYearlyStats.tsv";
 
 
 
@@ -62,11 +62,16 @@ DECLARE @conferenceFieldsOfStudyYearlyStatsOutPath string = @"/output/conference
            //Total citations from start yeear
            Math.Max(1, //In case start year citation is 0, force it to be 1 to avoid division by 0 error
                (long)(SUM(@conferencePapers.Year == @confFieldHotnessStartYear ? 
-                            @conferencePapers.CitationCount : 0 ) *
-                      //Total citation count between start year and now = Sum citation if paper year is within start and last year
-                      SUM((@conferencePapers.Year >= @confFieldHotnessStartYear && @conferencePapers.Year <= @lastYear) ? 
-                            @conferencePapers.CitationCount : 0))
-           ) AS Hotness
+                            @conferencePapers.CitationCount : 0 )
+                    )
+                     
+           )
+           //* (long)SUM(@conferencePapers.Year >= @confFieldHotnessStartYear && @conferencePapers.Year <= @lastYear ? 
+           //                @conferencePapers.CitationCount : 0) 
+           AS Hotness,
+            //Total citation count between start year and now = Sum citation if paper year is within start and last year
+                      (long)SUM(@conferencePapers.Year >= @confFieldHotnessStartYear && @conferencePapers.Year <= @lastYear ? 
+                            @conferencePapers.CitationCount : 0) AS CitationCountIn5Year
     FROM @conferencePapers
          INNER JOIN
              PaperFieldOfStudy
@@ -81,7 +86,8 @@ DECLARE @conferenceFieldsOfStudyYearlyStatsOutPath string = @"/output/conference
            FieldOfStudy.Level,
            @conferencePapersFosHotness.FieldMinYear,
            @conferencePapersFosHotness.FieldMaxYear,
-           @conferencePapersFosHotness.Hotness          
+           @conferencePapersFosHotness.Hotness,
+           @conferencePapersFosHotness.CitationCountIn5Year
     FROM FieldOfStudy
          INNER JOIN
              @conferencePapersFosHotness
