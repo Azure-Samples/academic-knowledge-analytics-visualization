@@ -4,7 +4,6 @@
 DECLARE @GraphVersion string = "2018-03-06";
 DECLARE @GraphDir   string = "/graph/" + @GraphVersion + "/";
 DECLARE @pathAffiliations string = @GraphDir + "Affiliations.txt";
-DECLARE @GraphDBName string = "GraphDB-" + @GraphVersion;
 
 
 DROP DATABASE IF EXISTS AcdemicGraph; 
