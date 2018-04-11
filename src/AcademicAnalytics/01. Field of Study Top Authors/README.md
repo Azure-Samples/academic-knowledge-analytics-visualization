@@ -56,7 +56,7 @@ This Power BI report file is for comparison. If you run the script as is then us
 
 ## Resources
 
-- [Analytics & Visualization Samples for Academic Graph](/README.md)
+- [Analytics & Visualization Samples for Academic Graph](https://github.com/Azure-Samples/academic-knowledge-analytics-visualization)
 - [Slicers in Power BI](https://docs.microsoft.com/en-us/power-bi/power-bi-visualization-slicers)
 - [Working with tables in Power BI reports](https://docs.microsoft.com/en-us/power-bi/power-bi-visualization-tables)
 - [Microsoft Academic Website](https://academic.microsoft.com/) 

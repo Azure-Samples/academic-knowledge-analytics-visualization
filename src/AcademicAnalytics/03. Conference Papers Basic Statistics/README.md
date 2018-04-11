@@ -3,9 +3,6 @@
 This sample code illustrates how to calculate basic paper statistics for a particular conference series using USQL and visualize the results with Power BI.
 
 
-<iframe width="800" height="600" src="https://msit.powerbi.com/view?r=eyJrIjoiOTNhNGM5ZDItNDFjOC00NTk3LWE2NGEtNTI2NmExODNiOWY4IiwidCI6IjcyZjk4OGJmLTg2ZjEtNDFhZi05MWFiLTJkN2NkMDExZGI0NyIsImMiOjV9" frameborder="0" allowFullScreen="true"></iframe>
-
-
 ![](/images/PBIConferencePaperCount(WWW).png "WWW paper count")
 ![](/images/PBIConferenceReferenceCitationCount(WWW).png "WWW paper count")
 
@@ -56,9 +53,6 @@ This Power BI report file is for comparison. If you run the script as is then us
 
 ## Resources
 
-- [Analytics & Visualization Samples for Academic Graph](/README.md)
+- [Analytics & Visualization Samples for Academic Graph](https://github.com/Azure-Samples/academic-knowledge-analytics-visualization)
 - [Scatter charts and bubble charts in Power BI ](https://docs.microsoft.com/en-us/power-bi/power-bi-visualization-scatter)
 - [Microsoft Academic Website](https://academic.microsoft.com/) 
-
-
-* [Conference Paper Statistics](/src/AcademicAnalytics/03.%20Conference%20Papers%20Basic%20Statistics/README.md)

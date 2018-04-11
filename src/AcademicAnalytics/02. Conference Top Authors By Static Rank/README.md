@@ -55,7 +55,7 @@ This Power BI report file is for comparison. If you run the script as is then us
 
 ## Resources
 
-- [Analytics & Visualization Samples for Academic Graph](/README.md)
+- [Analytics & Visualization Samples for Academic Graph](https://github.com/Azure-Samples/academic-knowledge-analytics-visualization)
 - [USQL RANK() Documentation](https://msdn.microsoft.com/en-us/azure/data-lake-analytics/u-sql/rank-u-sql)
 - [Scatter charts and bubble charts in Power BI ](https://docs.microsoft.com/en-us/power-bi/power-bi-visualization-scatter)
 - [Microsoft Academic Website](https://academic.microsoft.com/) 

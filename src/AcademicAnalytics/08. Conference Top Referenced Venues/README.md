@@ -77,7 +77,7 @@ This Power BI report file is for comparison. If you run the script as is then us
 
 ## Resources
 
-- [Analytics & Visualization Samples for Academic Graph](/README.md)
+- [Analytics & Visualization Samples for Academic Graph](https://github.com/Azure-Samples/academic-knowledge-analytics-visualization)
 - [Visual Awesomeness Unlocked – Sankey diagram](https://powerbi.microsoft.com/en-us/blog/visual-awesomeness-unlocked-sankey-diagram/)
 - [Use the Matrix visual in Power BI Desktop](https://docs.microsoft.com/en-us/power-bi/desktop-matrix-visual)
 - [Microsoft Academic Website](https://academic.microsoft.com/)
