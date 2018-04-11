@@ -2,6 +2,10 @@
 
 This sample code illustrates how to calculate basic paper statistics for a particular conference series using USQL and visualize the results with Power BI.
 
+
+<iframe width="800" height="600" src="https://msit.powerbi.com/view?r=eyJrIjoiOTNhNGM5ZDItNDFjOC00NTk3LWE2NGEtNTI2NmExODNiOWY4IiwidCI6IjcyZjk4OGJmLTg2ZjEtNDFhZi05MWFiLTJkN2NkMDExZGI0NyIsImMiOjV9" frameborder="0" allowFullScreen="true"></iframe>
+
+
 ![](/images/PBIConferencePaperCount(WWW).png "WWW paper count")
 ![](/images/PBIConferenceReferenceCitationCount(WWW).png "WWW paper count")
 

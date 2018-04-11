@@ -1,3 +1,9 @@
+---
+services: academic-knowledge
+platforms: dotnet
+author: alch-msft
+---
+
 # Analytics & Visualization Samples for Academic Graph 
 
 This project aims to help data scientists become familar with the Microsoft Academic Graph through analystics and visualization samples using Data Lake Analytics (USQL) and Power BI.  
