@@ -1,7 +1,11 @@
 ---
+title: Analytics and Visualization Samples for Academic Graph
 services: academic-knowledge
 platforms: dotnet
 author: alch-msft
+ms.topic: tutorial
+ms.service: data-lake-analytics
+description: This project illustrates how to perform analystics and visualization for Microsoft Academic Graph using Data Lake Analytics (USQL) and Power BI.
 ---
 
 # Analytics & Visualization Samples for Academic Graph 
@@ -35,7 +39,7 @@ The project contains 9 samples
 - An Azure Data Lake Analytics account
     - [Azure Data Lake Analytics](https://azure.microsoft.com/en-us/services/data-lake-analytics/)
 - Power BI Desktop
-    - https://powerbi.microsoft.com/en-us/desktop/
+    - [Microsoft Power BI Desktop](https://powerbi.microsoft.com/en-us/desktop/)
 - Visual Studio with Data lake tools 
     - Included in [Visual Studio 2017](https://www.visualstudio.com/downloads/)
     - [Plug in for Visual Studio 2015](https://www.microsoft.com/en-us/download/details.aspx?id=49504)
@@ -79,7 +83,7 @@ The project contains 9 samples
 - Make sure USQL script finished sucessfully
 - Open up corresponding Power BI Template(.pbit) from file explorer (Visual studio doesn't recognize Power BI files) 
 - Enter your ADL information and parameters corrisponding to your scripts
-![](/images/PBITemplateInitParam.png "Sample template load")
+![Sample template load](/images/PBITemplateInitParam.png)
 - Make sure the parameters cases are the same as your script and "click" to load
 
 ## Resources
