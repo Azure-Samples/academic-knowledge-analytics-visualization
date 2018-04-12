@@ -1,15 +1,15 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
-DECLARE @GraphVersion string = "2018-03-06";
+DECLARE @GraphVersion string = "2018-02-23";
 DECLARE @GraphDir   string = "/graph/" + @GraphVersion + "/";
 DECLARE @pathAffiliations string = @GraphDir + "Affiliations.txt";
 DECLARE @GraphDBName string = "GraphDB-" + @GraphVersion;
 
 
-DROP DATABASE IF EXISTS AcdemicGraph; 
-CREATE DATABASE AcdemicGraph;
-USE DATABASE AcdemicGraph;
+DROP DATABASE IF EXISTS AcdemicGraph20180223; 
+CREATE DATABASE AcdemicGraph20180223;
+USE DATABASE AcdemicGraph20180223;
 
 
 CREATE TABLE Affiliation

@@ -1,0 +1,87 @@
+﻿DECLARE @numberOfRowMatchTestStr string = "Equal # of rows";
+DECLARE @newRowPercent string = "% of new rows";
+
+@oldStream  =
+    EXTRACT AuthorName string,
+            DetailsUrl string,
+            PublicationCount int?,
+            CitationCount int?,
+            AuthorCitationRank int,
+            AuthorPublicationRank int
+    FROM "/output/conferenceAnalytics/WWW20180223/conferenceTopAuthors.tsv"
+    USING Extractors.Tsv(skipFirstNRows:1);
+
+@newStream  =
+    EXTRACT AuthorName string,
+            DetailsUrl string,
+            PublicationCount int?,
+            CitationCount int?,
+            AuthorCitationRank int,
+            AuthorPublicationRank int
+    FROM "/output/conferenceAnalytics/WWW20180306/conferenceTopAuthors.tsv"
+    USING Extractors.Tsv(skipFirstNRows:1);
+
+
+@oldStreamWithKey =
+    SELECT DetailsUrl AS Key
+    FROM @oldStream;
+
+@newStreamWithKey =
+    SELECT DetailsUrl AS Key
+    FROM @newStream;
+
+@oldStreamRowCountTest =
+    SELECT @numberOfRowMatchTestStr AS Test,
+           COUNT( * ) AS RowCount
+    FROM @oldStream;
+
+@newStreamRowCountTest =
+    SELECT @numberOfRowMatchTestStr AS Test,
+           COUNT( * ) AS RowCount
+    FROM @newStream;
+
+@testResult =
+    SELECT @oldStreamRowCountTest.Test,
+           @newStreamRowCountTest.RowCount - @oldStreamRowCountTest.RowCount == 0? "Pass" : "Fail" AS Result
+    FROM @oldStreamRowCountTest
+         JOIN
+             @newStreamRowCountTest
+         ON @oldStreamRowCountTest.Test == @newStreamRowCountTest.Test;
+
+@newRowCountTestTotal =
+    SELECT @newRowPercent AS Test,
+           RowCount AS TotalRowCount
+    FROM @oldStreamRowCountTest;
+
+
+@newRows =
+    SELECT *
+    FROM @newStreamWithKey
+    EXCEPT
+    SELECT *
+    FROM @oldStreamWithKey;
+
+@newRowCountTest =
+    SELECT @newRowPercent AS Test,
+           COUNT(*) AS NewRowCount
+    FROM @newRows;
+
+@newRowCountTest =
+    SELECT @newRowCountTest.Test,
+           (double) @newRowCountTest.NewRowCount / @newRowCountTestTotal.TotalRowCount * 100 + " % new rows" AS Result
+    FROM @newRowCountTest
+         JOIN
+             @newRowCountTestTotal
+         ON @newRowCountTest.Test == @newRowCountTestTotal.Test;
+
+
+@testResult =
+    SELECT *
+    FROM @testResult
+    UNION
+    SELECT *
+    FROM @newRowCountTest;
+
+OUTPUT @testResult
+TO @"/output/conferenceAnalytics/WWW20180306/conferenceTopAuthors.testResult.tsv"
+USING Outputters.Tsv(outputHeader : true);

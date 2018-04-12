@@ -15,7 +15,7 @@ DECLARE @conferenceTopAuthorsCount int = 20;  //Number of top authors to output
 //*************************************************************************
 //This output path pattern is hardcoded to the pbi file. If this is changed, the pbi file needs to be modified as well
 DECLARE @conferenceAnalyticsBaseDir string = @"/output/conferenceAnalytics/";
-DECLARE @outputBaseDir string = @conferenceAnalyticsBaseDir + @conferenceShortName + "/";
+DECLARE @outputBaseDir string = @conferenceAnalyticsBaseDir + @conferenceShortName + "20180306/";
 
 //*************************Ouptut Section**********************************
 //                 All output files for this script.
