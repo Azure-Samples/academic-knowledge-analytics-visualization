@@ -37,7 +37,7 @@ The script should output one tsv with headers. Here's what to expect
 
 ### ConferenceTopAuthorsByStaticRank.pbit
 
-The template visualizes the results using a scatter chart to compare the three dimensions publication count, rank, and normalized rank.
+The template visualizes the results using a scatter chart to compare the three dimensions publication count, rank, and normalized rank. Authors with lots of quality publications should appear on the top right corner.
 
 #### Template Parameters
 | Parameter Name |  Type  |                  Description                  |
@@ -45,7 +45,7 @@ The template visualizes the results using a scatter chart to compare the three d
 |  ADL URI    | string | The URI of the Azure Data Lake Store where the script wrote its output. You can find this information through Azure Portal by navigating to [{Your data lake store instance}] -> [Overview] -> [Essentials]  |
 | Conference Short Name | string | Used for finding the correct path to files output by the script. This should be the same value as @conferenceShortName in the script for the template to load correctly. |
 
-We made the top right corner of the scatter chart the "ideal" corner for easier visual consumption. Since we can't make Power BI show decreasing X/Y axes, we have to flip the rank from postive to negative. We did this by creating a measure with a formula of -1 * rank.
+We made the top right corner of the scatter chart the "ideal" corner for easier visual consumption. Although a lower rank value should represent better rank standing, Power BI doesn't support decreasing X/Y axes. We flip the rank from postive to negative such that authors with best normalized static rank and static rank will appear on the top right. We did this by creating a measure with a formula of -1 * rank.
 ![](/images/PBISignFlipMeasure.png "flip sign using measure")
 
 
