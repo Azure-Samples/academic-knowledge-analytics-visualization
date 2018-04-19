@@ -1,6 +1,7 @@
 ﻿DECLARE @numberOfRowMatchTestStr string = "Equal # of rows";
 DECLARE @newRowPercent string = "% of new rows";
 
+
 @oldStream  =
     EXTRACT AuthorName string,
             DetailsUrl string,

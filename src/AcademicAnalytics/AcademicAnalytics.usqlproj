@@ -31,6 +31,7 @@
     <Script Include="08. Conference Top Referenced Venues\AggregateConferenceReferencesByYearAndVenue.usql" />
     <Script Include="09. Conference Top Citing Venues\AggregateConferenceCitationsByYearAndVenue.usql" />
     <Script Include="test.usql" />
+    <Script Include="TestStreamExtraction.usql" />
     <ScriptCode Include="00. Common Scripts\CreateDatabase.usql.cs">
       <DependentUpon>00. Common Scripts\CreateDatabase.usql</DependentUpon>
     </ScriptCode>
@@ -63,6 +64,9 @@
     </ScriptCode>
     <ScriptCode Include="test.usql.cs">
       <DependentUpon>test.usql</DependentUpon>
+    </ScriptCode>
+    <ScriptCode Include="TestStreamExtraction.usql.cs">
+      <DependentUpon>TestStreamExtraction.usql</DependentUpon>
     </ScriptCode>
   </ItemGroup>
   <ItemGroup>

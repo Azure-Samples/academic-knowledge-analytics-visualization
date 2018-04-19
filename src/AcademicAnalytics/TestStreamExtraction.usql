@@ -1,0 +1,20 @@
+﻿DROP DATABASE IF EXISTS AcdemicGraph20180406; 
+CREATE DATABASE AcdemicGraph20180406;;
+USE DATABASE AcdemicGraph20180406;;
+
+
+CREATE TABLE Affiliation
+(
+    INDEX af_indx
+    CLUSTERED(AffiliationId)
+    DISTRIBUTED BY
+    HASH(AffiliationId)
+)AS
+EXTRACT AffiliationId long,
+        Rank uint,
+        NormalizedName string,
+        DisplayName string,
+        PaperCount int?,
+        CitationCount int?
+FROM @"/local/Academic/Test/Entities/2018/04/06/Affiliations/Affiliations.ss"
+USING Extractors.SStream();
