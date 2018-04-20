@@ -35,7 +35,7 @@ The [Quick Start](###Quickstart) guide below applys to all samples.
 
 - An Azure Data Lake Store with a copy of Microsoft Academic Graph
     - [Azure Data Lake Store](https://azure.microsoft.com/en-us/services/data-lake-store/)
-    - Place holder for graph download instruction link
+    - Contact [Academic API](academicapi@microsoft.com) to get Microsoft Academic Graph access on your data lake store
 - An Azure Data Lake Analytics account
     - [Azure Data Lake Analytics](https://azure.microsoft.com/en-us/services/data-lake-analytics/)
 - Power BI Desktop

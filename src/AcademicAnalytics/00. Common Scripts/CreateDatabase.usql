@@ -1,7 +1,7 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
-DECLARE @GraphVersion string = "2018-03-06";
+DECLARE @GraphVersion string = "2018-04-13";
 DECLARE @GraphDir   string = "/graph/" + @GraphVersion + "/";
 DECLARE @pathAffiliations string = @GraphDir + "Affiliations.txt";
 
@@ -22,8 +22,12 @@ EXTRACT AffiliationId long,
         Rank uint,
         NormalizedName string,
         DisplayName string,
+        GridId string,
+        OfficialPage string,
+        WikiPage string,
         PaperCount int?,
-        CitationCount int?
+        CitationCount int?,
+        CreatedDate DateTime
 FROM @pathAffiliations
 USING Extractors.Tsv(silent : true, quoting : false);
 
@@ -42,7 +46,8 @@ EXTRACT AuthorId long,
         DisplayName string,
         LastKnownAffiliationId long?,
         PaperCount int?,
-        CitationCount int?
+        CitationCount int?,
+        CreatedDate DateTime
 FROM @pathAuthors
 USING Extractors.Tsv(silent : true, quoting : false);
 
@@ -70,7 +75,8 @@ EXTRACT ConferenceInstanceId long,
         NotificationDueDate DateTime?,
         FinalVersionDueDate DateTime?,
         PaperCount int?,
-        CitationCount int?
+        CitationCount int?,
+        CreatedDate DateTime
 FROM @pathConferenceInstances
 USING Extractors.Tsv(silent : true, quoting : false);
 
@@ -88,7 +94,8 @@ EXTRACT ConferenceSeriesId long,
         NormalizedName string,
         DisplayName string,
         PaperCount int?,
-        CitationCount int?
+        CitationCount int?,
+        CreatedDate DateTime
 FROM @pathConferenceSeries
 USING Extractors.Tsv(silent : true, quoting : false);
 
@@ -106,9 +113,11 @@ EXTRACT FieldOfStudyId long,
         Rank uint,
         NormalizedName string,
         DisplayName string,
+        MainType string,
         Level int,
         PaperCount int?,
-        CitationCount int?
+        CitationCount int?,
+        CreatedDate DateTime
 FROM @pathFieldsOfStudy
 USING Extractors.Tsv(silent : true, quoting : false);
 
@@ -139,8 +148,12 @@ EXTRACT JournalId long,
         Rank uint,
         NormalizedName string,
         DisplayName string,
+        Issn string,
+        Publisher string,
+        Webpage string,
         PaperCount int?,
-        CitationCount int?
+        CitationCount int?,
+        CreatedDate DateTime
 FROM @pathJournals
 USING Extractors.Tsv(silent : true, quoting : false);
 
@@ -173,7 +186,8 @@ EXTRACT PaperId long,
         LastPage string,
         ReferenceCount int,
         CitationCount int?,
-        EstimatedCitationCount int?
+        EstimatedCitationCount int?,
+        CreatedDate DateTime
 FROM @pathPapers
 USING Extractors.Tsv(silent : true, quoting : false);
 
@@ -252,6 +266,19 @@ EXTRACT PaperId long,
 FROM @pathPaperLanguages
 USING Extractors.Tsv(silent : true, quoting : false);
 
+DECLARE @pathPaperRecommendations string = @GraphDir + "PaperRecommendations.txt";
+CREATE TABLE PaperRecommendations
+(
+    INDEX pr_idx
+    CLUSTERED(PaperId)
+    DISTRIBUTED BY
+    HASH(PaperId)
+) AS
+EXTRACT PaperId long,
+        RecommendedPaperId long,
+        Score float
+FROM @pathPaperRecommendations
+USING Extractors.Tsv(silent : true, quoting : false);
 
 DECLARE @pathPaperReferences string = @GraphDir + "PaperReferences.txt";
 CREATE TABLE PaperReference
