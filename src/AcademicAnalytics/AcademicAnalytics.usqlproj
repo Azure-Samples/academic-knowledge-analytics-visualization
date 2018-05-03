@@ -30,6 +30,7 @@
     <Script Include="07. Conference Memory of References\AggregateConferenceReferencesByYear.usql" />
     <Script Include="08. Conference Top Referenced Venues\AggregateConferenceReferencesByYearAndVenue.usql" />
     <Script Include="09. Conference Top Citing Venues\AggregateConferenceCitationsByYearAndVenue.usql" />
+    <Script Include="Format FOS Hierarchy.usql" />
     <Script Include="test.usql" />
     <Script Include="TestStreamExtraction.usql" />
     <ScriptCode Include="00. Common Scripts\CreateDatabase.usql.cs">
@@ -61,6 +62,9 @@
     </ScriptCode>
     <ScriptCode Include="09. Conference Top Citing Venues\AggregateConferenceCitationsByYearAndVenue.usql.cs">
       <DependentUpon>09. Conference Top Citing Venues\AggregateConferenceCitationsByYearAndVenue.usql</DependentUpon>
+    </ScriptCode>
+    <ScriptCode Include="Format FOS Hierarchy.usql.cs">
+      <DependentUpon>Format FOS Hierarchy.usql</DependentUpon>
     </ScriptCode>
     <ScriptCode Include="test.usql.cs">
       <DependentUpon>test.usql</DependentUpon>

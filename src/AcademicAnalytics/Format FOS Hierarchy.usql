@@ -1,0 +1,74 @@
+﻿
+
+
+@fosRelationshipWithPathToRoot =
+    SELECT FieldOfStudyChildren.FieldOfStudyId,
+           F1.DisplayName AS Name,
+           F1.Level AS Level,
+           FieldOfStudyChildren.ChildFieldOfStudyId,
+           F2.DisplayName AS ChildName
+    FROM FieldOfStudyChildren
+         JOIN
+             FieldOfStudy AS F1
+         ON F1.FieldOfStudyId == FieldOfStudyChildren.FieldOfStudyId
+         JOIN
+             FieldOfStudy AS F2
+         ON F2.FieldOfStudyId == FieldOfStudyChildren.ChildFieldOfStudyId
+    WHERE F1.Level + 1 == F2.Level;
+
+
+@hierarchy =
+    SELECT FieldOfStudyId AS F0_Id,
+           Name AS F0_Name
+    FROM @fosRelationshipWithPathToRoot
+    WHERE Level == 0;
+
+@hierarchy =
+    SELECT @hierarchy. *,
+           (long)(@fosRelationshipWithPathToRoot.ChildFieldOfStudyId == null ? -1 : @fosRelationshipWithPathToRoot.ChildFieldOfStudyId) AS F1_Id,
+           @fosRelationshipWithPathToRoot.ChildName AS F1_Name
+    FROM @hierarchy
+         LEFT OUTER JOIN
+             @fosRelationshipWithPathToRoot
+         ON @hierarchy.F0_Id == @fosRelationshipWithPathToRoot.FieldOfStudyId;
+
+
+@hierarchy =
+    SELECT @hierarchy. *,
+           (long)(@fosRelationshipWithPathToRoot.ChildFieldOfStudyId == null ? -1 : @fosRelationshipWithPathToRoot.ChildFieldOfStudyId) AS F2_Id,
+           @fosRelationshipWithPathToRoot.ChildName AS F2_Name
+    FROM @hierarchy
+         LEFT OUTER JOIN
+             @fosRelationshipWithPathToRoot
+         ON @hierarchy.F1_Id == @fosRelationshipWithPathToRoot.FieldOfStudyId;
+
+@hierarchy =
+    SELECT @hierarchy. *,
+           (long)(@fosRelationshipWithPathToRoot.ChildFieldOfStudyId == null ? -1 : @fosRelationshipWithPathToRoot.ChildFieldOfStudyId) AS F3_Id,
+           @fosRelationshipWithPathToRoot.ChildName AS F3_Name
+    FROM @hierarchy
+         LEFT OUTER JOIN
+             @fosRelationshipWithPathToRoot
+         ON @hierarchy.F2_Id == @fosRelationshipWithPathToRoot.FieldOfStudyId;
+
+@hierarchy =
+    SELECT @hierarchy. *,
+           (long)(@fosRelationshipWithPathToRoot.ChildFieldOfStudyId == null ? -1 : @fosRelationshipWithPathToRoot.ChildFieldOfStudyId) AS F4_Id,
+           @fosRelationshipWithPathToRoot.ChildName AS F4_Name
+    FROM @hierarchy
+         LEFT OUTER JOIN
+             @fosRelationshipWithPathToRoot
+         ON @hierarchy.F3_Id == @fosRelationshipWithPathToRoot.FieldOfStudyId;
+
+
+@hierarchy =
+    SELECT @hierarchy. *,
+           (long)(@fosRelationshipWithPathToRoot.ChildFieldOfStudyId == null ? -1 : @fosRelationshipWithPathToRoot.ChildFieldOfStudyId) AS F5_Id,
+           @fosRelationshipWithPathToRoot.ChildName AS F5_Name
+    FROM @hierarchy
+         LEFT OUTER JOIN
+             @fosRelationshipWithPathToRoot
+         ON @hierarchy.F4_Id == @fosRelationshipWithPathToRoot.FieldOfStudyId;
+
+OUTPUT @hierarchy TO @"/output/ETAP/FOSHierarchy.tsv"
+USING Outputters.Tsv(outputHeader : true);
