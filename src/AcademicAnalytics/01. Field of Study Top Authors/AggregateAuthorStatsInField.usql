@@ -9,7 +9,7 @@ USE DATABASE AcdemicGraph;
 //*************************************************************************
 DECLARE @fieldName string = "computer science";
 DECLARE @fieldTopAuthorsCount int = 100;  //Number of top authors to output
-//
+
 //*******************Constant Variable Section*****************************
 //        Defining const variables to be used by other parts of the script
 //*************************************************************************
