@@ -1,0 +1,177 @@
+﻿// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
+
+//Make sure to run CreateDatabase script from common scripts first!
+USE DATABASE AcdemicGraph20180413;
+
+//*******************Input Variable Section********************************
+//        Change these variables for different calculations
+//*************************************************************************
+
+
+//*******************Constant Variable Section*****************************
+//        Defining const variables to be used by other parts of the script
+//*************************************************************************
+//This output path pattern is hardcoded to the pbi file. If this is changed, the pbi file needs to be modified as well
+DECLARE @entityAnalyticsBaseDir string = @"/output/entityAnalytics/";
+DECLARE @outputBaseDir string = @entityAnalyticsBaseDir;
+
+//*************************Ouptut Section**********************************
+//                 All output files for this script.
+//*************************************************************************
+DECLARE @fos_l0_outpath string =  @outputBaseDir + "FOS_L0.tsv";
+DECLARE @fos_l1_outpath string =  @outputBaseDir + "FOS_L1.tsv";
+DECLARE @fos_l2_outpath string =  @outputBaseDir + "FOS_L2.tsv";
+DECLARE @fos_l3_outpath string =  @outputBaseDir + "FOS_L3.tsv";
+DECLARE @fos_l4_outpath string =  @outputBaseDir + "FOS_L4.tsv";
+DECLARE @fos_l5_outpath string =  @outputBaseDir + "FOS_L5.tsv";
+DECLARE @fos_l6_outpath string =  @outputBaseDir + "FOS_L6.tsv";
+
+DECLARE @relationship_fos_l0_to_l1_outpath string =  @outputBaseDir + "Relationship_FOS_L0_L1.tsv";
+DECLARE @relationship_fos_l1_to_l2_outpath string =  @outputBaseDir + "Relationship_FOS_L1_L2.tsv";
+DECLARE @relationship_fos_l2_to_l3_outpath string =  @outputBaseDir + "Relationship_FOS_L2_L3.tsv";
+DECLARE @relationship_fos_l3_to_l4_outpath string =  @outputBaseDir + "Relationship_FOS_L3_L4.tsv";
+DECLARE @relationship_fos_l4_to_l5_outpath string =  @outputBaseDir + "Relationship_FOS_L4_L5.tsv";
+DECLARE @relationship_fos_l5_to_l6_outpath string =  @outputBaseDir + "Relationship_FOS_L5_L6.tsv";
+
+
+
+//filter out all fos relationships that are not from level n -> level n +1  
+@fosRelationshipWithPathToRoot =
+    SELECT FieldOfStudyChildren.FieldOfStudyId,
+           F1.DisplayName AS Name,
+           F1.Level + 1 AS Level,
+           F1.PaperCount AS PublicationCount,
+           FieldOfStudyChildren.ChildFieldOfStudyId,
+           F2.DisplayName AS ChildName,
+           F2.Level + 1 AS ChildLevel,
+           F2.PaperCount AS ChildPublicationCount
+    FROM FieldOfStudyChildren
+         JOIN
+             FieldOfStudy AS F1
+         ON F1.FieldOfStudyId == FieldOfStudyChildren.FieldOfStudyId
+         JOIN
+             FieldOfStudy AS F2
+         ON F2.FieldOfStudyId == FieldOfStudyChildren.ChildFieldOfStudyId
+    WHERE F1.Level + 1 == F2.Level;
+
+@fosTotalPaperCount =
+    SELECT SUM(FieldOfStudy.PaperCount) AS PublicationCount
+    FROM FieldOfStudy
+    WHERE FieldOfStudy.Level == 0;
+
+
+@fosRootRelationship =
+    SELECT 0 AS FieldOfStudyId,
+           "All" AS Name,
+           0 AS Level,
+           @fosTotalPaperCount.PublicationCount AS PublicationCount,
+           FieldOfStudy.FieldOfStudyId AS ChildFieldOfStudyId,
+           FieldOfStudy.DisplayName AS ChildName,
+           FieldOfStudy.PaperCount AS ChildPublicationCount,
+           FieldOfStudy.Level + 1 AS ChildLevel
+    FROM FieldOfStudy
+         CROSS JOIN
+             @fosTotalPaperCount
+    WHERE FieldOfStudy.Level == 0;
+
+
+@fosRelationshipWithPathToRoot =
+    SELECT *
+    FROM @fosRelationshipWithPathToRoot
+    UNION ALL
+    SELECT *
+    FROM @fosRootRelationship;
+
+
+@fos_l0 =
+    SELECT DISTINCT FieldOfStudyId AS FId_0,
+                    Name,
+                    PublicationCount
+    FROM @fosRelationshipWithPathToRoot
+    WHERE Level == 0;
+
+OUTPUT @fos_l0
+TO @fos_l0_outpath
+USING Outputters.Tsv(outputHeader : true);
+
+
+
+
+@fos_l1 =
+    SELECT DISTINCT FieldOfStudyId AS FId_1,
+                    Name,
+                    PublicationCount
+    FROM @fosRelationshipWithPathToRoot
+    WHERE Level == 1;
+
+OUTPUT @fos_l1
+TO @fos_l1_outpath
+USING Outputters.Tsv(outputHeader : true);
+
+
+@fos_l2 =
+    SELECT DISTINCT FieldOfStudyId AS FId_2,
+                    Name,
+                    PublicationCount
+    FROM @fosRelationshipWithPathToRoot
+    WHERE Level == 2;
+
+OUTPUT @fos_l2
+TO @fos_l2_outpath
+USING Outputters.Tsv(outputHeader : true);
+
+
+@fos_l3 =
+    SELECT DISTINCT FieldOfStudyId AS FId_3,
+                    Name,
+                    PublicationCount
+    FROM @fosRelationshipWithPathToRoot
+    WHERE Level == 3;
+
+OUTPUT @fos_l3
+TO @fos_l3_outpath
+USING Outputters.Tsv(outputHeader : true);
+
+
+
+@fos_l4 =
+    SELECT DISTINCT FieldOfStudyId AS FId_4,
+                    Name,
+                    PublicationCount
+    FROM @fosRelationshipWithPathToRoot
+    WHERE Level == 4;
+
+OUTPUT @fos_l4
+TO @fos_l4_outpath
+USING Outputters.Tsv(outputHeader : true);
+
+
+
+@fos_l5 =
+    SELECT DISTINCT FieldOfStudyId AS FId_5,
+                    Name,
+                    PublicationCount
+    FROM @fosRelationshipWithPathToRoot
+    WHERE Level == 5;
+
+OUTPUT @fos_l5
+TO @fos_l5_outpath
+USING Outputters.Tsv(outputHeader : true);
+
+
+@fos_l6 =
+    SELECT DISTINCT ChildFieldOfStudyId AS FId_6,
+                    ChildName,
+                    ChildPublicationCount
+    FROM @fosRelationshipWithPathToRoot
+    WHERE ChildLevel == 6;
+
+OUTPUT @fos_l6
+TO @fos_l6_outpath
+USING Outputters.Tsv(outputHeader : true);
+
+
+
+
+
