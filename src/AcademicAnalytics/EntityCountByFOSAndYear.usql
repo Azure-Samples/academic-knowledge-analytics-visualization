@@ -1,0 +1,184 @@
+﻿// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
+
+//Make sure to run CreateDatabase script from common scripts first!
+USE DATABASE AcdemicGraph20180424;
+
+//*******************Input Variable Section********************************
+//        Change these variables for different calculations
+//*************************************************************************
+
+
+//*******************Constant Variable Section*****************************
+//        Defining const variables to be used by other parts of the script
+//*************************************************************************
+//This output path pattern is hardcoded to the pbi file. If this is changed, the pbi file needs to be modified as well
+DECLARE @entityAnalyticsBaseDir string = @"/output/entityAnalytics/";
+DECLARE @outputBaseDir string = @entityAnalyticsBaseDir;
+
+//*************************Ouptut Section**********************************
+//                 All output files for this script.
+//*************************************************************************
+
+DECLARE @entityCountPerYear_fos_l1_outpath string =  @outputBaseDir + "EntityCountPerYear_By_FOS_L1.tsv";
+DECLARE @entityCountPerYear_fos_l2_outpath string =  @outputBaseDir + "EntityCountPerYear_By_FOS_L2.tsv";
+DECLARE @entityCountPerYear_fos_l3_outpath string =  @outputBaseDir + "EntityCountPerYear_By_FOS_L3.tsv";
+DECLARE @entityCountPerYear_fos_l4_outpath string =  @outputBaseDir + "EntityCountPerYear_By_FOS_L4.tsv";
+DECLARE @entityCountPerYear_fos_l5_outpath string =  @outputBaseDir + "EntityCountPerYear_By_FOS_L5.tsv";
+DECLARE @entityCountPerYear_fos_l6_outpath string =  @outputBaseDir + "EntityCountPerYear_By_FOS_L6.tsv";
+
+
+@fosRelationshipWithPathToRoot =
+    SELECT FieldOfStudyChildren.FieldOfStudyId,
+           F1.DisplayName AS Name,
+           F1.Level + 1 AS Level,
+           F1.PaperCount AS PublicationCount,
+           FieldOfStudyChildren.ChildFieldOfStudyId,
+           F2.DisplayName AS ChildName,
+           F2.Level + 1 AS ChildLevel,
+           F2.PaperCount AS ChildPublicationCount
+    FROM FieldOfStudyChildren
+         JOIN
+             FieldOfStudy AS F1
+         ON F1.FieldOfStudyId == FieldOfStudyChildren.FieldOfStudyId
+         JOIN
+             FieldOfStudy AS F2
+         ON F2.FieldOfStudyId == FieldOfStudyChildren.ChildFieldOfStudyId
+    WHERE F1.Level + 1 == F2.Level;
+
+
+@allValidFos =
+    SELECT FieldOfStudyId,
+           Level
+    FROM @fosRelationshipWithPathToRoot
+    UNION DISTINCT
+    SELECT ChildFieldOfStudyId AS FieldOfStudyId,
+           ChildLevel AS Level
+    FROM @fosRelationshipWithPathToRoot;
+
+
+@paperAuthorAffiliationFieldsOfStudy =
+    SELECT PaperFieldOfStudy.FieldOfStudyId,
+           @allValidFos.Level,
+           PaperFieldOfStudy.PaperId,
+           PaperAuthorAffiliation.AuthorId,
+           PaperAuthorAffiliation.AffiliationId,
+           Paper.Year
+    FROM Paper
+         JOIN
+             PaperFieldOfStudy
+         ON Paper.PaperId == PaperFieldOfStudy.PaperId
+         JOIN
+             PaperAuthorAffiliation
+         ON Paper.PaperId == PaperAuthorAffiliation.PaperId
+         JOIN
+             @allValidFos
+         ON PaperFieldOfStudy.FieldOfStudyId == @allValidFos.FieldOfStudyId;
+
+@authorAffiliationCountByYearAndFos =
+    SELECT COUNT(DISTINCT AffiliationId) AS AffiliationCount,
+           COUNT(DISTINCT AuthorId) AS AuthorCount,
+           ANY_VALUE(Level) AS Level,
+           Year,
+           FieldOfStudyId
+    FROM @paperAuthorAffiliationFieldsOfStudy
+    GROUP BY Year,
+             FieldOfStudyId;
+
+
+@entityStatsByYearAndFos =
+    SELECT AffiliationCount AS Count,
+           Level,
+           Year,
+           FieldOfStudyId,
+           "Affiliation" AS EntityType
+    FROM @authorAffiliationCountByYearAndFos
+    UNION
+    SELECT AuthorCount AS Count,
+           Level,
+           Year,
+           FieldOfStudyId,
+           "Author" AS EntityType
+    FROM @authorAffiliationCountByYearAndFos;
+
+
+
+
+
+
+
+
+@entityCountPerYear_fos_l1 =
+    SELECT FieldOfStudyId AS FId_1,
+           Year,
+           Count,
+           EntityType
+    FROM @entityStatsByYearAndFos
+    WHERE Level == 1;
+
+OUTPUT @entityCountPerYear_fos_l1
+TO @entityCountPerYear_fos_l1_outpath
+USING Outputters.Tsv(outputHeader : true);
+
+
+@entityCountPerYear_fos_l2 =
+    SELECT FieldOfStudyId AS FId_2,
+           Year,
+           Count,
+           EntityType
+    FROM @entityStatsByYearAndFos
+    WHERE Level == 2;
+
+OUTPUT @entityCountPerYear_fos_l2
+TO @entityCountPerYear_fos_l2_outpath
+USING Outputters.Tsv(outputHeader : true);
+
+
+@entityCountPerYear_fos_l3 =
+    SELECT FieldOfStudyId AS FId_3,
+           Year,
+           Count,
+           EntityType
+    FROM @entityStatsByYearAndFos
+    WHERE Level == 3;
+
+OUTPUT @entityCountPerYear_fos_l3
+TO @entityCountPerYear_fos_l3_outpath
+USING Outputters.Tsv(outputHeader : true);
+
+@entityCountPerYear_fos_l4 =
+    SELECT FieldOfStudyId AS FId_4,
+           Year,
+           Count,
+           EntityType
+    FROM @entityStatsByYearAndFos
+    WHERE Level == 4;
+
+OUTPUT @entityCountPerYear_fos_l4
+TO @entityCountPerYear_fos_l4_outpath
+USING Outputters.Tsv(outputHeader : true);
+
+@entityCountPerYear_fos_l5 =
+    SELECT FieldOfStudyId AS FId_5,
+           Year,
+           Count,
+           EntityType
+    FROM @entityStatsByYearAndFos
+    WHERE Level == 5;
+
+OUTPUT @entityCountPerYear_fos_l5
+TO @entityCountPerYear_fos_l5_outpath
+USING Outputters.Tsv(outputHeader : true);
+
+
+@entityCountPerYear_fos_l6 =
+    SELECT FieldOfStudyId AS FId_6,
+           Year,
+           Count,
+           EntityType
+    FROM @entityStatsByYearAndFos
+    WHERE Level == 6;
+
+OUTPUT @entityCountPerYear_fos_l6
+TO @entityCountPerYear_fos_l6_outpath
+USING Outputters.Tsv(outputHeader : true);

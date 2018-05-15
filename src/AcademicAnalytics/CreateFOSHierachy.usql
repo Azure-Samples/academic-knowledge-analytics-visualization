@@ -2,7 +2,7 @@
 // Licensed under the MIT License.
 
 //Make sure to run CreateDatabase script from common scripts first!
-USE DATABASE AcdemicGraph20180413;
+USE DATABASE AcdemicGraph20180424;
 
 //*******************Input Variable Section********************************
 //        Change these variables for different calculations
@@ -35,7 +35,6 @@ DECLARE @relationship_fos_l4_to_l5_outpath string =  @outputBaseDir + "Relations
 DECLARE @relationship_fos_l5_to_l6_outpath string =  @outputBaseDir + "Relationship_FOS_L5_L6.tsv";
 
 
-
 //filter out all fos relationships that are not from level n -> level n +1  
 @fosRelationshipWithPathToRoot =
     SELECT FieldOfStudyChildren.FieldOfStudyId,
@@ -62,14 +61,14 @@ DECLARE @relationship_fos_l5_to_l6_outpath string =  @outputBaseDir + "Relations
 
 
 @fosRootRelationship =
-    SELECT 0 AS FieldOfStudyId,
+    SELECT (long) 0 AS FieldOfStudyId,
            "All" AS Name,
            0 AS Level,
            @fosTotalPaperCount.PublicationCount AS PublicationCount,
            FieldOfStudy.FieldOfStudyId AS ChildFieldOfStudyId,
            FieldOfStudy.DisplayName AS ChildName,
-           FieldOfStudy.PaperCount AS ChildPublicationCount,
-           FieldOfStudy.Level + 1 AS ChildLevel
+           FieldOfStudy.Level + 1 AS ChildLevel,
+           FieldOfStudy.PaperCount AS ChildPublicationCount           
     FROM FieldOfStudy
          CROSS JOIN
              @fosTotalPaperCount
@@ -96,14 +95,12 @@ TO @fos_l0_outpath
 USING Outputters.Tsv(outputHeader : true);
 
 
-
-
 @fos_l1 =
-    SELECT DISTINCT FieldOfStudyId AS FId_1,
-                    Name,
-                    PublicationCount
+    SELECT DISTINCT ChildFieldOfStudyId AS FId_1,
+                    ChildName AS Name,
+                    ChildPublicationCount AS PublicationCount
     FROM @fosRelationshipWithPathToRoot
-    WHERE Level == 1;
+    WHERE ChildLevel == 1;
 
 OUTPUT @fos_l1
 TO @fos_l1_outpath
@@ -111,11 +108,11 @@ USING Outputters.Tsv(outputHeader : true);
 
 
 @fos_l2 =
-    SELECT DISTINCT FieldOfStudyId AS FId_2,
-                    Name,
-                    PublicationCount
+    SELECT DISTINCT ChildFieldOfStudyId AS FId_2,
+                    ChildName AS Name,
+                    ChildPublicationCount AS PublicationCount
     FROM @fosRelationshipWithPathToRoot
-    WHERE Level == 2;
+    WHERE ChildLevel == 2;
 
 OUTPUT @fos_l2
 TO @fos_l2_outpath
@@ -123,11 +120,11 @@ USING Outputters.Tsv(outputHeader : true);
 
 
 @fos_l3 =
-    SELECT DISTINCT FieldOfStudyId AS FId_3,
-                    Name,
-                    PublicationCount
+    SELECT DISTINCT ChildFieldOfStudyId AS FId_3,
+                    ChildName AS Name,
+                    ChildPublicationCount AS PublicationCount
     FROM @fosRelationshipWithPathToRoot
-    WHERE Level == 3;
+    WHERE ChildLevel == 3;
 
 OUTPUT @fos_l3
 TO @fos_l3_outpath
@@ -136,11 +133,11 @@ USING Outputters.Tsv(outputHeader : true);
 
 
 @fos_l4 =
-    SELECT DISTINCT FieldOfStudyId AS FId_4,
-                    Name,
-                    PublicationCount
+    SELECT DISTINCT ChildFieldOfStudyId AS FId_4,
+                    ChildName AS Name,
+                    ChildPublicationCount AS PublicationCount
     FROM @fosRelationshipWithPathToRoot
-    WHERE Level == 4;
+    WHERE ChildLevel == 4;
 
 OUTPUT @fos_l4
 TO @fos_l4_outpath
@@ -149,11 +146,11 @@ USING Outputters.Tsv(outputHeader : true);
 
 
 @fos_l5 =
-    SELECT DISTINCT FieldOfStudyId AS FId_5,
-                    Name,
-                    PublicationCount
+    SELECT DISTINCT ChildFieldOfStudyId AS FId_5,
+                    ChildName AS Name,
+                    ChildPublicationCount AS PublicationCount
     FROM @fosRelationshipWithPathToRoot
-    WHERE Level == 5;
+    WHERE ChildLevel == 5;
 
 OUTPUT @fos_l5
 TO @fos_l5_outpath
@@ -162,8 +159,8 @@ USING Outputters.Tsv(outputHeader : true);
 
 @fos_l6 =
     SELECT DISTINCT ChildFieldOfStudyId AS FId_6,
-                    ChildName,
-                    ChildPublicationCount
+                    ChildName AS Name,
+                    ChildPublicationCount AS PublicationCount
     FROM @fosRelationshipWithPathToRoot
     WHERE ChildLevel == 6;
 
@@ -173,5 +170,66 @@ USING Outputters.Tsv(outputHeader : true);
 
 
 
+//Relationships
+@relationship_fos_l0_to_l1 =
+    SELECT FieldOfStudyId AS FId_0,
+           ChildFieldOfStudyId AS FId_1
+    FROM @fosRelationshipWithPathToRoot
+    WHERE @fosRelationshipWithPathToRoot.Level == 0;
+
+OUTPUT @relationship_fos_l0_to_l1
+TO @relationship_fos_l0_to_l1_outpath
+USING Outputters.Tsv(outputHeader : true);
+
+@relationship_fos_l1_to_l2 =
+    SELECT FieldOfStudyId AS FId_1,
+           ChildFieldOfStudyId AS FId_2
+    FROM @fosRelationshipWithPathToRoot
+    WHERE @fosRelationshipWithPathToRoot.Level == 1;
+
+OUTPUT @relationship_fos_l1_to_l2
+TO @relationship_fos_l1_to_l2_outpath
+USING Outputters.Tsv(outputHeader : true);
 
 
+@relationship_fos_l2_to_l3 =
+    SELECT FieldOfStudyId AS FId_2,
+           ChildFieldOfStudyId AS FId_3
+    FROM @fosRelationshipWithPathToRoot
+    WHERE @fosRelationshipWithPathToRoot.Level == 2;
+
+OUTPUT @relationship_fos_l2_to_l3
+TO @relationship_fos_l2_to_l3_outpath
+USING Outputters.Tsv(outputHeader : true);
+
+
+@relationship_fos_l3_to_l4 =
+    SELECT FieldOfStudyId AS FId_3,
+           ChildFieldOfStudyId AS FId_4
+    FROM @fosRelationshipWithPathToRoot
+    WHERE @fosRelationshipWithPathToRoot.Level == 3;
+
+OUTPUT @relationship_fos_l3_to_l4
+TO @relationship_fos_l3_to_l4_outpath
+USING Outputters.Tsv(outputHeader : true);
+
+
+@relationship_fos_l4_to_l5 =
+    SELECT FieldOfStudyId AS FId_4,
+           ChildFieldOfStudyId AS FId_5
+    FROM @fosRelationshipWithPathToRoot
+    WHERE @fosRelationshipWithPathToRoot.Level == 4;
+
+OUTPUT @relationship_fos_l4_to_l5
+TO @relationship_fos_l4_to_l5_outpath
+USING Outputters.Tsv(outputHeader : true);
+
+@relationship_fos_l5_to_l6 =
+    SELECT FieldOfStudyId AS FId_5,
+           ChildFieldOfStudyId AS FId_6
+    FROM @fosRelationshipWithPathToRoot
+    WHERE @fosRelationshipWithPathToRoot.Level == 5;
+
+OUTPUT @relationship_fos_l5_to_l6
+TO @relationship_fos_l5_to_l6_outpath
+USING Outputters.Tsv(outputHeader : true);

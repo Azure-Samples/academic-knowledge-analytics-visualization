@@ -1,0 +1,232 @@
+﻿// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
+
+//Make sure to run CreateDatabase script from common scripts first!
+USE DATABASE AcdemicGraph20180424;
+
+//*******************Input Variable Section********************************
+//        Change these variables for different calculations
+//*************************************************************************
+
+
+//*******************Constant Variable Section*****************************
+//        Defining const variables to be used by other parts of the script
+//*************************************************************************
+//This output path pattern is hardcoded to the pbi file. If this is changed, the pbi file needs to be modified as well
+DECLARE @entityAnalyticsBaseDir string = @"/output/entityAnalytics/";
+DECLARE @outputBaseDir string = @entityAnalyticsBaseDir;
+
+DECLARE @thisYear int = DateTime.Now.Year;
+
+//*************************Ouptut Section**********************************
+//                 All output files for this script.
+//*************************************************************************
+DECLARE @entityStats_fos_outpath string = @outputBaseDir + "Conference_Stats_FOS.tsv";
+DECLARE @entityDetails_outpath string = @outputBaseDir + "Conference_Details.tsv";
+//DECLARE @entityStats_fos_l0_outpath string =  @outputBaseDir + "Entity_Stats_By_FOS_L0.tsv";
+//DECLARE @entityStats_fos_l1_outpath string =  @outputBaseDir + "Entity_Stats_By_FOS_L1.tsv";
+//DECLARE @entityStats_fos_l2_outpath string =  @outputBaseDir + "Entity_Stats_By_FOS_L2.tsv";
+//DECLARE @entityStats_fos_l3_outpath string =  @outputBaseDir + "Entity_Stats_By_FOS_L3.tsv";
+//DECLARE @entityStats_fos_l4_outpath string =  @outputBaseDir + "Entity_Stats_By_FOS_L4.tsv";
+//DECLARE @entityStats_fos_l5_outpath string =  @outputBaseDir + "Entity_Stats_By_FOS_L5.tsv";
+//DECLARE @entityStats_fos_l6_outpath string =  @outputBaseDir + "Entity_Stats_By_FOS_L6.tsv";
+
+@entityDetails =
+//    SELECT Journal.JournalId AS EntityId,
+//           Journal.DisplayName AS Name
+//    FROM Journal
+//    UNION ALL
+    SELECT ConferenceSeries.ConferenceSeriesId AS EntityId,
+           ConferenceSeries.NormalizedName AS Name
+    FROM ConferenceSeries
+         //        UNION ALL 
+         //    SELECT Affiliation.AffiliationId AS EntityId, 
+         //           Affiliation.DisplayName AS Name
+         //    FROM Affiliation 
+         //        UNION ALL 
+         //    SELECT Author.AuthorId AS EntityId, 
+         //           Author.DisplayName AS Name 
+         //    FROM Author
+         ;
+
+OUTPUT @entityDetails
+TO @entityDetails_outpath
+USING Outputters.Tsv(outputHeader : true);
+
+@papers =
+    SELECT PaperId,
+           JournalId,
+           ConferenceSeriesId,
+           Math.Exp((double) Rank * ( - 1.0) / 1000) AS RankScore,
+           EstimatedCitation == 50 ? CitationCount : EstimatedCitation AS EstimatedCitation,
+           Year
+    FROM Paper
+//    WHERE Year < @thisYear
+;
+
+@paperFos =
+    SELECT PaperFieldOfStudy.PaperId,
+           PaperFieldOfStudy.FieldOfStudyId,
+           @papers.JournalId,
+           @papers.ConferenceSeriesId,
+           @papers.RankScore,
+           @papers.EstimatedCitation,
+           @papers.Year,
+           FieldOfStudy.Level
+    FROM PaperFieldOfStudy
+         JOIN
+             FieldOfStudy
+         ON PaperFieldOfStudy.FieldOfStudyId == FieldOfStudy.FieldOfStudyId
+         JOIN
+             @papers
+         ON PaperFieldOfStudy.PaperId == @papers.PaperId;
+
+//@paperJournalFos =
+//    SELECT @paperFos.PaperId,
+//           @paperFos.FieldOfStudyId,
+//           (long)@paperFos.JournalId AS EntityId,
+//           @paperFos.RankScore,
+//           @paperFos.EstimatedCitation,
+//           @paperFos.Year,
+//           @paperFos.Level
+//    FROM @paperFos
+//WHERE @paperFos.JournalId != null;
+
+
+@paperConferenceFos =
+    SELECT @paperFos.PaperId,
+           @paperFos.FieldOfStudyId,
+           (long)@paperFos.ConferenceSeriesId AS EntityId,
+           @paperFos.RankScore,
+           @paperFos.EstimatedCitation,
+           @paperFos.Year,
+           @paperFos.Level
+    FROM @paperFos
+WHERE @paperFos.ConferenceSeriesId != null;
+
+
+//
+//@paperAuthorAffiliationFos =
+//    SELECT @paperFos.PaperId,
+//           @paperFos.FieldOfStudyId,
+//           PaperAuthorAffiliation.AuthorId,
+//           PaperAuthorAffiliation.AffiliationId,
+//           @paperFos.RankScore,
+//           @paperFos.EstimatedCitation,
+//           @paperFos.Year,
+//           @paperFos.Level
+//    FROM @paperFos
+//         JOIN
+//             PaperAuthorAffiliation
+//         ON @paperFos.PaperId == PaperAuthorAffiliation.PaperId;
+//
+//@paperAuthorFos =
+//    SELECT @paperAuthorAffiliationFos.PaperId,
+//           @paperAuthorAffiliationFos.FieldOfStudyId,
+//           @paperAuthorAffiliationFos.AuthorId AS EntityId,
+//           @paperAuthorAffiliationFos.RankScore,
+//           @paperAuthorAffiliationFos.EstimatedCitation,
+//           @paperAuthorAffiliationFos.Year,
+//           @paperAuthorAffiliationFos.Level
+//    FROM @paperAuthorAffiliationFos;
+//
+//@paperAffiliationFos =
+//    SELECT @paperAuthorAffiliationFos.PaperId,
+//           @paperAuthorAffiliationFos.FieldOfStudyId,
+//           (long)@paperAuthorAffiliationFos.AffiliationId AS EntityId,
+//           @paperAuthorAffiliationFos.RankScore,
+//           @paperAuthorAffiliationFos.EstimatedCitation,
+//           @paperAuthorAffiliationFos.Year,
+//           @paperAuthorAffiliationFos.Level
+//    FROM @paperAuthorAffiliationFos
+//    WHERE @paperAuthorAffiliationFos.AffiliationId != null;
+
+
+@paperEntityFos =
+//    SELECT @paperJournalFos. *,
+//           "Journal" AS EntityType
+//    FROM @paperJournalFos
+//    UNION ALL
+    SELECT @paperConferenceFos. *,
+           "Conference" AS EntityType
+    FROM @paperConferenceFos 
+//    UNION ALL 
+//    SELECT @paperAuthorFos.*, 
+//         "Author" AS EntityType 
+//    FROM @paperAuthorFos 
+//    UNION ALL 
+//    SELECT @paperAffiliationFos.*, 
+//           "Affiliation" AS EntityType 
+//         FROM @paperAffiliationFos
+;
+
+
+
+@paperEntityFosAll =
+    SELECT @paperEntityFos. *,
+           ROW_NUMBER() OVER(PARTITION BY @paperEntityFos.FieldOfStudyId, @paperEntityFos.EntityId ORDER BY @paperEntityFos.EstimatedCitation DESC) AS CitationRank,
+           "All" AS TimeRange
+    FROM @paperEntityFos;
+
+@paperEntityFos10yr =
+    SELECT @paperEntityFos. *,
+           ROW_NUMBER() OVER(PARTITION BY @paperEntityFos.FieldOfStudyId, @paperEntityFos.EntityId ORDER BY @paperEntityFos.EstimatedCitation DESC) AS CitationRank,
+           "10yr" AS TimeRange
+    FROM @paperEntityFos
+    WHERE @paperEntityFos.Year >= @thisYear - 10;
+
+
+@paperEntityFos5yr =
+    SELECT @paperEntityFos. *,
+           ROW_NUMBER() OVER(PARTITION BY @paperEntityFos.FieldOfStudyId, @paperEntityFos.EntityId ORDER BY @paperEntityFos.EstimatedCitation DESC) AS CitationRank,
+           "5yr" AS TimeRange
+    FROM @paperEntityFos
+    WHERE @paperEntityFos.Year >= @thisYear - 5;
+
+@paperEntityFosTimeRange =
+    SELECT *
+    FROM @paperEntityFosAll
+        UNION ALL
+    SELECT *
+    FROM @paperEntityFos10yr 
+        UNION ALL 
+    SELECT * FROM @paperEntityFos5yr;
+
+
+
+@entityFosStats =
+    SELECT @paperEntityFosTimeRange.FieldOfStudyId,
+           @paperEntityFosTimeRange.EntityId,
+           @paperEntityFosTimeRange.TimeRange,
+           ANY_VALUE(@paperEntityFosTimeRange.EntityType) AS EntityType,
+           ANY_VALUE(@paperEntityFosTimeRange.Level) AS Level,
+           (double)SUM(@paperEntityFosTimeRange.RankScore) AS RankScore,
+           SUM(@paperEntityFosTimeRange.EstimatedCitation) AS EstimatedCitation,
+           MAX(@paperEntityFosTimeRange.EstimatedCitation >= @paperEntityFosTimeRange.CitationRank ? @paperEntityFosTimeRange.CitationRank:0) AS HIndex 
+    FROM @paperEntityFosTimeRange
+    GROUP BY @paperEntityFosTimeRange.FieldOfStudyId,
+             @paperEntityFosTimeRange.EntityId,
+             @paperEntityFosTimeRange.TimeRange;
+
+@entityFosStats =
+    SELECT @entityFosStats. *,
+           RANK() OVER(PARTITION BY @entityFosStats.FieldOfStudyId, @entityFosStats.EntityType, @entityFosStats.TimeRange ORDER BY RankScore DESC) AS RankScore_Rank,
+           RANK() OVER(PARTITION BY @entityFosStats.FieldOfStudyId, @entityFosStats.EntityType, @entityFosStats.TimeRange ORDER BY EstimatedCitation DESC) AS EstimatedCitation_Rank,
+           RANK() OVER(PARTITION BY @entityFosStats.FieldOfStudyId, @entityFosStats.EntityType, @entityFosStats.TimeRange ORDER BY HIndex DESC) AS HIndex_Rank
+    FROM @entityFosStats;
+
+
+@entityFosStats =
+    SELECT FieldOfStudyId,
+           EntityId,
+           TimeRange,
+//           Math.Log(RankScore)*1000*-1.0 AS Rank,
+           RankScore,
+           EstimatedCitation,
+           HIndex
+    FROM @entityFosStats
+    WHERE @entityFosStats.RankScore_Rank <= 100 OR @entityFosStats.EstimatedCitation_Rank <= 100 OR @entityFosStats.HIndex_Rank <= 100;
+
+OUTPUT @entityFosStats
+TO @entityStats_fos_outpath
+USING Outputters.Tsv(outputHeader : true);

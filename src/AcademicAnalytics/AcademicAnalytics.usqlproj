@@ -31,7 +31,9 @@
     <Script Include="08. Conference Top Referenced Venues\AggregateConferenceReferencesByYearAndVenue.usql" />
     <Script Include="09. Conference Top Citing Venues\AggregateConferenceCitationsByYearAndVenue.usql" />
     <Script Include="CreateFOSHierachy.usql" />
+    <Script Include="EntityCountByFOSAndYear.usql" />
     <Script Include="Format FOS Hierarchy.usql" />
+    <Script Include="FOSTop100Entity.usql" />
     <Script Include="test.usql" />
     <Script Include="TestStreamExtraction.usql" />
     <ScriptCode Include="00. Common Scripts\CreateDatabase.usql.cs">
@@ -67,8 +69,14 @@
     <ScriptCode Include="CreateFOSHierachy.usql.cs">
       <DependentUpon>CreateFOSHierachy.usql</DependentUpon>
     </ScriptCode>
+    <ScriptCode Include="EntityCountByFOSAndYear.usql.cs">
+      <DependentUpon>EntityCountByFOSAndYear.usql</DependentUpon>
+    </ScriptCode>
     <ScriptCode Include="Format FOS Hierarchy.usql.cs">
       <DependentUpon>Format FOS Hierarchy.usql</DependentUpon>
+    </ScriptCode>
+    <ScriptCode Include="FOSTop100Entity.usql.cs">
+      <DependentUpon>FOSTop100Entity.usql</DependentUpon>
     </ScriptCode>
     <ScriptCode Include="test.usql.cs">
       <DependentUpon>test.usql</DependentUpon>
