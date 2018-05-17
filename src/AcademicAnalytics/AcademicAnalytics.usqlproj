@@ -163,6 +163,12 @@
     <Content Include="09. Conference Top Citing Venues\README.md">
       <SubType>Content</SubType>
     </Content>
+    <Content Include="10. Field of Study Top Entities\TopicTopEntities.pbit">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="10. Field of Study Top Entities\TopicTopEntities.pbix">
+      <SubType>Content</SubType>
+    </Content>
   </ItemGroup>
   <!-- check for SDK Build target in current path then in USQLSDKPath in the case of command line build -->
   <Import Project="UsqlSDKBuild.targets" Condition="'$(BuildingInsideVisualStudio)' != 'true' And  Exists('UsqlSDKBuild.targets')" />

@@ -38,7 +38,7 @@ DECLARE @fosDetails_outpath string = @outputBaseDir + "FOSDetails.tsv";
     FROM Paper;
 
 
-//Get all [Paper] -> [Field of Study] relationship along with paper/field details for later calculation
+//Get all [Paper] -> [Field of Study] relationships along with paper/field details for later calculation
 @paperFos =
     SELECT PaperFieldOfStudy.PaperId,
            PaperFieldOfStudy.FieldOfStudyId,
@@ -56,7 +56,7 @@ DECLARE @fosDetails_outpath string = @outputBaseDir + "FOSDetails.tsv";
          ON PaperFieldOfStudy.PaperId == @papers.PaperId;
 
 
-//Get all [Journal] -> [Paper] -> [Field of Study] relationship
+//Get all [Journal] -> [Paper] -> [Field of Study] relationships
 @paperJournalFos =
     SELECT @paperFos.PaperId,
            @paperFos.FieldOfStudyId,
@@ -68,7 +68,7 @@ DECLARE @fosDetails_outpath string = @outputBaseDir + "FOSDetails.tsv";
 WHERE @paperFos.JournalId != null;
 
 
-//Get all [Conference] -> [Paper] -> [Field of Study] relationship
+//Get all [Conference] -> [Paper] -> [Field of Study] relationships
 @paperConferenceFos =
     SELECT @paperFos.PaperId,
            @paperFos.FieldOfStudyId,
@@ -80,7 +80,7 @@ WHERE @paperFos.JournalId != null;
 WHERE @paperFos.ConferenceSeriesId != null;
 
 
-//Get all [Paper] -> [Author] -> [Affiliation] relationship
+//Get all [Paper] -> [Author] -> [Affiliation] relationships
 @paperAuthorAffiliationFos =
     SELECT @paperFos.PaperId,
            @paperFos.FieldOfStudyId,
@@ -95,7 +95,7 @@ WHERE @paperFos.ConferenceSeriesId != null;
          ON @paperFos.PaperId == PaperAuthorAffiliation.PaperId;
 
 
-//Get all [Paper] -> [Author] relationship
+//Get all [Paper] -> [Author] relationships
 @paperAuthorFos =
     SELECT @paperAuthorAffiliationFos.PaperId,
            @paperAuthorAffiliationFos.FieldOfStudyId,
@@ -106,7 +106,7 @@ WHERE @paperFos.ConferenceSeriesId != null;
     FROM @paperAuthorAffiliationFos;
 
 
-//Get all [Paper] -> [Affiliation] relationship
+//Get all [Paper] -> [Affiliation] relationships
 @paperAffiliationFos =
     SELECT @paperAuthorAffiliationFos.PaperId,
            @paperAuthorAffiliationFos.FieldOfStudyId,
@@ -118,7 +118,7 @@ WHERE @paperFos.ConferenceSeriesId != null;
     WHERE @paperAuthorAffiliationFos.AffiliationId != null;
 
 
-//Union all the relationship we got above to form [Paper] -> [Entity] -> [Field of Study]
+//Union all the relationships we got above to form [Paper] -> [Entity] -> [Field of Study]
 @paperEntityFos =
     SELECT @paperJournalFos. *,
            "Journal" AS EntityType
