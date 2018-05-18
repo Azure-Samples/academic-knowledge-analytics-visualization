@@ -7,7 +7,7 @@ USE DATABASE AcdemicGraph20180424;
 //*******************Input Variable Section********************************
 //        Change these variables for different calculations
 //*************************************************************************
-DECLARE @topKEntities = 10; //Output only top 10 entities
+DECLARE @topEntitiesCount = 10; //Output only top 10 entities
 
 //*******************Constant Variable Section*****************************
 //        Defining const variables to be used by other parts of the script
@@ -209,9 +209,9 @@ WHERE @paperFos.ConferenceSeriesId != null;
            EstimatedCitation,
            HIndex
     FROM @entityFosStats
-    WHERE @entityFosStats.RankScore_Rank <= @topKEntities 
-          OR @entityFosStats.EstimatedCitation_Rank <= @topKEntities 
-          OR @entityFosStats.HIndex_Rank <= @topKEntities;
+    WHERE @entityFosStats.RankScore_Rank <= @topEntitiesCount 
+          OR @entityFosStats.EstimatedCitation_Rank <= @topEntitiesCount 
+          OR @entityFosStats.HIndex_Rank <= @topEntitiesCount;
 
 
 OUTPUT @entityFosStats
