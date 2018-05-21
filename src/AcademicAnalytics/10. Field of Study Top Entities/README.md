@@ -1,15 +1,18 @@
 # Field of Study Top Entities
 
-This sample code illustrates how to find top entities by Microsoft Academic Rank, H-Index, Estimated Citations and time range for all fields of study using USQL script and visualize the results using Power BI.
+This sample code illustrates how to find top entities by Microsoft Academic Rank, H-Index, Estimated Citations and time range for all fields of study using USQL script and visualize the results using Power BI. 
 
 ![](/images/PBIFieldOfStudyTopEntities.png "Field of study top entities") 
+
+
+[Microsoft Academic](https://academic.microsoft.com/) also uses similar calculation to power its Entity Type Analytics Page. Check out [Authors Analytics Page](https://academic.microsoft.com/#/authors/0/), [Conference Analytics Page] (https://academic.microsoft.com/#/conferences/0/), [Journal Analytics Page] (https://academic.microsoft.com/#/journals/0/), [Institution Analytics Page] (https://academic.microsoft.com/#/institutions/0/) to see these stats in action. 
 
 
 ## Getting started
 
 ### FieldTopEntities.usql
 
-This script illustrates how find top enities for each fields of study by calculating Microsoft Academic Rank, H-Index, and Estimated Citations. The calculation is also done for three different time ranges, All time, 5 year, and 10 year. 
+This script illustrates how find top enities for each field of study by calculating Microsoft Academic Rank, H-Index, and Estimated Citations. The calculation is also done for three different time ranges, all time, past 5 years, and past 10 years. 
 
 
 #### Input Parameters
@@ -24,7 +27,7 @@ The script has the following parameters
 
 #### Output Files
 
-The script should output three tsv with headers. Here's what to expect
+The script should output three tsv's with headers. Here's what to expect
 
 `EntityStatsByFOS.tsv`
 
