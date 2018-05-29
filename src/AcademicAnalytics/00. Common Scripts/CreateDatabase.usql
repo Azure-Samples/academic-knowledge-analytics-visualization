@@ -6,7 +6,7 @@
 //*******************Input Variable Section********************************
 //        Change these variables for different graph versions
 //*************************************************************************
-DECLARE @graphVersion string = "2018-04-13";
+DECLARE @graphVersion string = "2018-05-07";
 
 //*******************Constant Variable Section*****************************
 //        Defining const variables to be used by other parts of the script

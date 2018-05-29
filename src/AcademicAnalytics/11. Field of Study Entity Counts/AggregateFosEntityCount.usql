@@ -1,0 +1,95 @@
+﻿// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
+
+//Make sure to run CreateDatabase script from common scripts first!
+USE DATABASE AcdemicGraph;
+
+//*******************Constant Variable Section*****************************
+//        Defining const variables to be used by other parts of the script
+//*************************************************************************
+//This output path pattern is hardcoded to the pbi file. If this is changed, the pbi file needs to be modified as well
+DECLARE @entityAnalyticsBaseDir string = @"/output/fieldAnalytics/";
+DECLARE @outputBaseDir string = @entityAnalyticsBaseDir;
+
+//*************************Ouptut Section**********************************
+//                 All output files for this script.
+//*************************************************************************
+DECLARE @entityCountPerYear_fos_outpath string =  @outputBaseDir + "entityCountPerYearByFOS.tsv";
+DECLARE @fosDetails_outpath string =  @outputBaseDir + "fosDetails.tsv";
+
+
+
+
+//Get all [Paper] -> [FieldOfStudy] -> [Author] -> [Affiliation] relationships
+@paperAuthorAffiliationFieldsOfStudy =
+    SELECT PaperFieldOfStudy.FieldOfStudyId,
+           PaperFieldOfStudy.PaperId,
+           PaperAuthorAffiliation.AuthorId,
+           PaperAuthorAffiliation.AffiliationId,
+           Paper.JournalId,
+           Paper.ConferenceSeriesId,
+           Paper.Year
+    FROM Paper
+         INNER JOIN
+             PaperFieldOfStudy
+         ON Paper.PaperId == PaperFieldOfStudy.PaperId
+         INNER JOIN
+             PaperAuthorAffiliation
+         ON Paper.PaperId == PaperAuthorAffiliation.PaperId;
+
+
+//Get distinct affiliation, author, journal and confernece count for each field of study by year
+@authorAffiliationJournalConferenceCountByYearAndFos =
+    SELECT COUNT(DISTINCT AffiliationId) AS AffiliationCount,
+           COUNT(DISTINCT AuthorId) AS AuthorCount,
+           COUNT(DISTINCT JournalId) AS JournalCount,
+           COUNT(DISTINCT ConferenceSeriesId) AS ConferenceCount,
+           Year,
+           FieldOfStudyId
+    FROM @paperAuthorAffiliationFieldsOfStudy
+    GROUP BY Year,
+             FieldOfStudyId;
+
+
+//Re-format result from {FieldOfStudyId, Year, AuthorCount, AffiliationCount, JournalCount, ConferenceCount} to {FieldOfStudyId, Year, Count, EntityType} for easier consumption by visual components.
+@entityStatsByYearAndFos =
+    SELECT FieldOfStudyId,
+           Year,
+           "Affiliation" AS EntityType,
+           AffiliationCount AS Count         
+    FROM @authorAffiliationJournalConferenceCountByYearAndFos
+        UNION ALL
+    SELECT FieldOfStudyId,
+           Year,
+           "Author" AS EntityType,
+           AuthorCount AS Count
+    FROM @authorAffiliationJournalConferenceCountByYearAndFos
+        UNION ALL
+    SELECT FieldOfStudyId,
+           Year,
+           "Journal" AS EntityType,
+           JournalCount AS Count
+    FROM @authorAffiliationJournalConferenceCountByYearAndFos
+         UNION ALL
+    SELECT FieldOfStudyId,
+           Year,
+           "Conference" AS EntityType,
+           ConferenceCount AS Count
+    FROM @authorAffiliationJournalConferenceCountByYearAndFos;
+
+
+OUTPUT @entityStatsByYearAndFos
+TO @entityCountPerYear_fos_outpath
+USING Outputters.Tsv(outputHeader : true);
+
+
+//output all [FieldOfStudyId, Name] for easier lookup in visuals
+@fieldsOfStudy =
+    SELECT FieldOfStudyId,
+           NormalizedName AS Name
+    FROM FieldOfStudy;
+
+
+OUTPUT @fieldsOfStudy
+TO @fosDetails_outpath
+USING Outputters.Tsv(outputHeader : true);
