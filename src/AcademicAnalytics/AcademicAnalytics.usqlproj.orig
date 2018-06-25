@@ -1,0 +1,181 @@
+﻿<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>7cee7d00-a99c-480a-8f7c-8adbed6a0abb</ProjectGuid>
+    <OutputType>File</OutputType>
+    <AssemblyName>Algebra.xml</AssemblyName>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <Name>AcademicAnalytics</Name>
+    <RootNamespace>AcademicAnalytics</RootNamespace>
+    <RuntimeVersion>default</RuntimeVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\Debug\</OutputPath>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugSymbols>false</DebugSymbols>
+    <OutputPath>bin\Release\</OutputPath>
+  </PropertyGroup>
+  <ItemGroup>
+    <Script Include="00. Common Scripts\CreateDatabase.usql" />
+    <Script Include="01. Field of Study Top Authors\AggregateAuthorStatsInField.usql" />
+    <Script Include="02. Conference Top Authors By Static Rank\AuthorRankInConference.usql" />
+    <Script Include="03. Conference Papers Basic Statistics\PaperYearlyStatisticsInConference.usql" />
+    <Script Include="04. Conference Top Papers\SelectTopPapersInConference.usql" />
+    <Script Include="05. Conference Top Authors\ConferenceTopAuthors.usql" />
+    <Script Include="06. Conference Top Institutions\ConferenceTopInstitutions.usql" />
+    <Script Include="07. Conference Memory of References\AggregateConferenceReferencesByYear.usql" />
+    <Script Include="08. Conference Top Referenced Venues\AggregateConferenceReferencesByYearAndVenue.usql" />
+    <Script Include="09. Conference Top Citing Venues\AggregateConferenceCitationsByYearAndVenue.usql" />
+    <Script Include="11. Field of Study Entity Counts\AggregateFosEntityCount.usql" />
+    <ScriptCode Include="00. Common Scripts\CreateDatabase.usql.cs">
+      <DependentUpon>00. Common Scripts\CreateDatabase.usql</DependentUpon>
+    </ScriptCode>
+    <ScriptCode Include="01. Field of Study Top Authors\AggregateAuthorStatsInField.usql.cs">
+      <DependentUpon>01. Field of Study Top Authors\AggregateAuthorStatsInField.usql</DependentUpon>
+    </ScriptCode>
+    <ScriptCode Include="02. Conference Top Authors By Static Rank\AuthorRankInConference.usql.cs">
+      <DependentUpon>02. Conference Top Authors By Static Rank\AuthorRankInConference.usql</DependentUpon>
+    </ScriptCode>
+    <ScriptCode Include="03. Conference Papers Basic Statistics\PaperYearlyStatisticsInConference.usql.cs">
+      <DependentUpon>03. Conference Papers Basic Statistics\PaperYearlyStatisticsInConference.usql</DependentUpon>
+    </ScriptCode>
+    <ScriptCode Include="04. Conference Top Papers\SelectTopPapersInConference.usql.cs">
+      <DependentUpon>04. Conference Top Papers\SelectTopPapersInConference.usql</DependentUpon>
+    </ScriptCode>
+    <ScriptCode Include="05. Conference Top Authors\ConferenceTopAuthors.usql.cs">
+      <DependentUpon>05. Conference Top Authors\ConferenceTopAuthors.usql</DependentUpon>
+    </ScriptCode>
+    <ScriptCode Include="06. Conference Top Institutions\ConferenceTopInstitutions.usql.cs">
+      <DependentUpon>06. Conference Top Institutions\ConferenceTopInstitutions.usql</DependentUpon>
+    </ScriptCode>
+    <ScriptCode Include="07. Conference Memory of References\AggregateConferenceReferencesByYear.usql.cs">
+      <DependentUpon>07. Conference Memory of References\AggregateConferenceReferencesByYear.usql</DependentUpon>
+    </ScriptCode>
+    <ScriptCode Include="08. Conference Top Referenced Venues\AggregateConferenceReferencesByYearAndVenue.usql.cs">
+      <DependentUpon>08. Conference Top Referenced Venues\AggregateConferenceReferencesByYearAndVenue.usql</DependentUpon>
+    </ScriptCode>
+    <ScriptCode Include="09. Conference Top Citing Venues\AggregateConferenceCitationsByYearAndVenue.usql.cs">
+      <DependentUpon>09. Conference Top Citing Venues\AggregateConferenceCitationsByYearAndVenue.usql</DependentUpon>
+    </ScriptCode>
+    <ScriptCode Include="11. Field of Study Entity Counts\AggregateFosEntityCount.usql.cs">
+      <DependentUpon>11. Field of Study Entity Counts\AggregateFosEntityCount.usql</DependentUpon>
+    </ScriptCode>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="00. Common Scripts" />
+    <Folder Include="01. Field of Study Top Authors" />
+    <Folder Include="02. Conference Top Authors By Static Rank" />
+    <Folder Include="03. Conference Papers Basic Statistics" />
+    <Folder Include="04. Conference Top Papers" />
+    <Folder Include="05. Conference Top Authors" />
+    <Folder Include="06. Conference Top Institutions" />
+    <Folder Include="07. Conference Memory of References" />
+    <Folder Include="08. Conference Top Referenced Venues" />
+    <Folder Include="09. Conference Top Citing Venues" />
+    <Folder Include="11. Field of Study Entity Counts" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="00. Common Scripts\README.md">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="01. Field of Study Top Authors\FieldTopAuthors.pbit">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="01. Field of Study Top Authors\FieldTopAuthors (Computer Science).pbix">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="01. Field of Study Top Authors\README.md">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="02. Conference Top Authors By Static Rank\ConferenceTopAuthorsByStaticRank.pbit">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="02. Conference Top Authors By Static Rank\ConferenceTopAuthorsByStaticRank (WWW).pbix">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="02. Conference Top Authors By Static Rank\README.md">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="03. Conference Papers Basic Statistics\ConferencePapersStatistics.pbit">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="03. Conference Papers Basic Statistics\ConferencePapersStatistics (WWW).pbix">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="03. Conference Papers Basic Statistics\README.md">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="04. Conference Top Papers\ConferenceTopPapers.pbit">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="04. Conference Top Papers\ConferenceTopPapers (WWW).pbix">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="04. Conference Top Papers\README.md">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="05. Conference Top Authors\ConferenceTopAuthors.pbit">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="05. Conference Top Authors\ConferenceTopAuthors (WWW).pbix">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="05. Conference Top Authors\README.md">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="06. Conference Top Institutions\ConferenceTopInstitutions.pbit">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="06. Conference Top Institutions\ConferenceTopInstitutions (WWW).pbix">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="06. Conference Top Institutions\README.md">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="07. Conference Memory of References\ConferenceMemoryOfReferences.pbit">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="07. Conference Memory of References\ConferenceMemoryOfReferences (WWW).pbix">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="07. Conference Memory of References\README.md">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="08. Conference Top Referenced Venues\ConferenceOutgoingReferences.pbit">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="08. Conference Top Referenced Venues\ConferenceOutgoingReferences (WWW).pbix">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="08. Conference Top Referenced Venues\README.md">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="09. Conference Top Citing Venues\ConferenceIncomingCitations.pbit">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="09. Conference Top Citing Venues\ConferenceIncomingCitations (WWW).pbix">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="09. Conference Top Citing Venues\README.md">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="11. Field of Study Entity Counts\README.md">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="11. Field of Study Entity Counts\TopicYearlyEntityCounts.pbit">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="11. Field of Study Entity Counts\TopicYearlyEntityCounts.pbix">
+      <SubType>Content</SubType>
+    </Content>
+  </ItemGroup>
+  <!-- check for SDK Build target in current path then in USQLSDKPath in the case of command line build -->
+  <Import Project="UsqlSDKBuild.targets" Condition="'$(BuildingInsideVisualStudio)' != 'true' And  Exists('UsqlSDKBuild.targets')" />
+  <Import Project="$(USQLSDKPath)\UsqlSDKBuild.targets" Condition="'$(BuildingInsideVisualStudio)' != 'true' And !Exists('UsqlSDKBuild.targets') And '$(USQLSDKPath)' != '' And Exists('$(USQLSDKPath)\UsqlSDKBuild.targets')" />
+  <!-- backward compatible with IDE build -->
+  <Import Project="$(AppData)\Microsoft\DataLake\MsBuild\1.0\Usql.targets" Condition="'$(BuildingInsideVisualStudio)' == 'true'" />
+</Project>
