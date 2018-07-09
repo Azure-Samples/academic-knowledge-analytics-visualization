@@ -6,14 +6,14 @@ USE DATABASE AcdemicGraph;
 //*******************Input Variable Section********************************
 //        Change these variables for different calculations
 //*************************************************************************
-DECLARE @reportOrg string = "microsoft";
-DECLARE @reportOrgMinYear int = 1975;
+DECLARE @organizationName string = "microsoft";
+DECLARE @organizationPaperMinYear int = 1991;
 
 //*******************Constant Variable Section*****************************
 //        Defining const variables to be used by other parts of the script
 //*************************************************************************
 //This output path pattern is hardcoded to the pbi file. If this is changed, the pbi file needs to be modified as well
-DECLARE @outputBaseDir string = @"/output/dev/organizationInsight/" + Uri.EscapeUriString(@reportOrg)+ "/";
+DECLARE @outputBaseDir string = @"/output/dev/organizationInsight/" + Uri.EscapeUriString(@organizationName)+ "/";
 DECLARE @maDetailPagePrefix = @"https://academic.microsoft.com/#/detail/";
 
 //*************************Ouptut Section**********************************
@@ -24,7 +24,6 @@ DECLARE @partnerAffiliationOutPath string = @outputBaseDir + "Partner_Affiliatio
 DECLARE @papersOutPath string = @outputBaseDir + "Paper.tsv";
 DECLARE @authorsOutPath string = @outputBaseDir + "Author.tsv";
 DECLARE @partnerAuthorsOutPath string = @outputBaseDir + "Partner_Author.tsv";
-DECLARE @conferencesOutPath string = @outputBaseDir + "Conference.tsv";
 DECLARE @paperAuthorAffiliationRelationshipOutPath string = @outputBaseDir + "PaperAuthorAffiliationRelationship.tsv";
 DECLARE @partnerPaperAuthorAffiliationRelationshipOutPath string = @outputBaseDir + "Partner_PaperAuthorAffiliationRelationship.tsv";
 DECLARE @venueOutPath string = @outputBaseDir + "Venue.tsv";
@@ -40,7 +39,7 @@ DECLARE @fieldOfStudyOutPath string = @outputBaseDir + "FieldOfStudy.tsv";
         AffiliationId, 
         DisplayName AS AffiliationName
     FROM Affiliation
-    WHERE NormalizedName == @reportOrg;
+    WHERE NormalizedName == @organizationName;
 
 
 OUTPUT @targetAffiliation
@@ -113,7 +112,7 @@ USING Outputters.Tsv(outputHeader:true);
          INNER JOIN
              @orgPaperIds
          ON Paper.PaperId == @orgPaperIds.PaperId
-    WHERE Year >= @reportOrgMinYear;
+    WHERE Year >= @organizationPaperMinYear;
 
 
 OUTPUT @orgPapers

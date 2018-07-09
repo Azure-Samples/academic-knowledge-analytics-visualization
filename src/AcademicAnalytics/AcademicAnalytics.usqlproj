@@ -179,10 +179,13 @@
     <Content Include="11. Field of Study Entity Counts\TopicYearlyEntityCounts.pbix">
       <SubType>Content</SubType>
     </Content>
-    <Content Include="12. Organization Insight\Org Insight%28Microsoft%29.pbix">
+    <Content Include="12. Organization Insight\OrganizationInsight %28Microsoft%29.pbix">
       <SubType>Content</SubType>
     </Content>
-    <Content Include="12. Organization Insight\Org Insight.pbit">
+    <Content Include="12. Organization Insight\OrganizationInsight.pbit">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="12. Organization Insight\README.md">
       <SubType>Content</SubType>
     </Content>
   </ItemGroup>
