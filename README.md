@@ -44,8 +44,6 @@ The project contains 11 samples
     - Included in [Visual Studio 2017](https://www.visualstudio.com/downloads/)
     - [Plug in for Visual Studio 2015](https://www.microsoft.com/en-us/download/details.aspx?id=49504)
 
-
-
 ### Quickstart
 
 #### Overview

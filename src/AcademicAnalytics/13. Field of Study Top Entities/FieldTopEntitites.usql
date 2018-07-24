@@ -1,0 +1,271 @@
+﻿// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
+
+//Make sure to run CreateDatabase script from common scripts first!
+USE DATABASE AcdemicGraph;
+
+//*******************Input Variable Section********************************
+//        Change these variables for different calculations
+//*************************************************************************
+DECLARE @topKEntities = 5; //Output only top 5 entities
+
+//*******************Constant Variable Section*****************************
+//        Defining const variables to be used by other parts of the script
+//*************************************************************************
+//This output path pattern is hardcoded to the pbi file. If this is changed, the pbi file needs to be modified as well
+DECLARE @entityAnalyticsBaseDir string = @"/output/fieldAnalytics/";
+DECLARE @outputBaseDir string = @entityAnalyticsBaseDir;
+DECLARE @thisYear int = DateTime.Now.Year;
+
+//*************************Ouptut Section**********************************
+//                 All output files for this script.
+//*************************************************************************
+DECLARE @entityStats_fos_outpath string = @outputBaseDir + "EntityStatsByFOS.tsv";
+DECLARE @entityDetails_outpath string = @outputBaseDir + "EntityDetails.tsv";
+DECLARE @fosDetails_outpath string = @outputBaseDir + "FOSDetails.tsv";
+
+
+
+
+//Get all papers and transform PaperRank to probability that can be summed. 
+@papers =
+    SELECT PaperId,
+           JournalId,
+           ConferenceSeriesId,
+           Math.Exp((double) Rank * ( - 1.0) / 1000) AS RankScore,
+           EstimatedCitation,
+           Year
+    FROM Paper;
+
+
+//Get all [Paper] -> [Field of Study] relationships along with paper/field details for later calculation
+@paperFos =
+    SELECT PaperFieldOfStudy.PaperId,
+           PaperFieldOfStudy.FieldOfStudyId,
+           @papers.JournalId,
+           @papers.ConferenceSeriesId,
+           @papers.RankScore,
+           @papers.EstimatedCitation,
+           @papers.Year
+    FROM PaperFieldOfStudy
+         INNER JOIN
+             FieldOfStudy
+         ON PaperFieldOfStudy.FieldOfStudyId == FieldOfStudy.FieldOfStudyId
+         INNER JOIN
+             @papers
+         ON PaperFieldOfStudy.PaperId == @papers.PaperId;
+
+
+//Get all [Journal] -> [Paper] -> [Field of Study] relationships
+@paperJournalFos =
+    SELECT @paperFos.PaperId,
+           @paperFos.FieldOfStudyId,
+           (long)@paperFos.JournalId AS EntityId,
+           @paperFos.RankScore,
+           @paperFos.EstimatedCitation,
+           @paperFos.Year
+    FROM @paperFos
+WHERE @paperFos.JournalId != null;
+
+
+//Get all [Conference] -> [Paper] -> [Field of Study] relationships
+@paperConferenceFos =
+    SELECT @paperFos.PaperId,
+           @paperFos.FieldOfStudyId,
+           (long)@paperFos.ConferenceSeriesId AS EntityId,
+           @paperFos.RankScore,
+           @paperFos.EstimatedCitation,
+           @paperFos.Year
+    FROM @paperFos
+WHERE @paperFos.ConferenceSeriesId != null;
+
+
+//Get all [Paper] -> [Author] -> [Affiliation] relationships
+@paperAuthorAffiliationFos =
+    SELECT @paperFos.PaperId,
+           @paperFos.FieldOfStudyId,
+           PaperAuthorAffiliation.AuthorId,
+           PaperAuthorAffiliation.AffiliationId,
+           @paperFos.RankScore,
+           @paperFos.EstimatedCitation,
+           @paperFos.Year
+    FROM @paperFos
+         JOIN
+             PaperAuthorAffiliation
+         ON @paperFos.PaperId == PaperAuthorAffiliation.PaperId;
+
+
+//Get all [Paper] -> [Author] relationships
+@paperAuthorFos =
+    SELECT @paperAuthorAffiliationFos.PaperId,
+           @paperAuthorAffiliationFos.FieldOfStudyId,
+           @paperAuthorAffiliationFos.AuthorId AS EntityId,
+           @paperAuthorAffiliationFos.RankScore,
+           @paperAuthorAffiliationFos.EstimatedCitation,
+           @paperAuthorAffiliationFos.Year
+    FROM @paperAuthorAffiliationFos;
+
+
+//Get all [Paper] -> [Affiliation] relationships
+@paperAffiliationFos =
+    SELECT @paperAuthorAffiliationFos.PaperId,
+           @paperAuthorAffiliationFos.FieldOfStudyId,
+           (long)@paperAuthorAffiliationFos.AffiliationId AS EntityId,
+           @paperAuthorAffiliationFos.RankScore,
+           @paperAuthorAffiliationFos.EstimatedCitation,
+           @paperAuthorAffiliationFos.Year
+    FROM @paperAuthorAffiliationFos
+    WHERE @paperAuthorAffiliationFos.AffiliationId != null;
+
+
+//Union all the relationships we got above to form [Paper] -> [Entity] -> [Field of Study]
+@paperEntityFos =
+    SELECT @paperJournalFos. *,
+           "Journal" AS EntityType
+    FROM @paperJournalFos
+        UNION ALL
+    SELECT @paperConferenceFos. *,
+           "Conference" AS EntityType
+    FROM @paperConferenceFos 
+        UNION ALL 
+    SELECT @paperAuthorFos.*, 
+         "Author" AS EntityType 
+    FROM @paperAuthorFos 
+        UNION ALL 
+    SELECT @paperAffiliationFos.*, 
+           "Affiliation" AS EntityType 
+         FROM @paperAffiliationFos;
+
+
+//Calcuate All time Rank by Estimated Citations for HIndex calcuation in later step
+@paperEntityFosAll =
+    SELECT @paperEntityFos. *,
+           ROW_NUMBER() OVER(PARTITION BY @paperEntityFos.FieldOfStudyId, @paperEntityFos.EntityId ORDER BY @paperEntityFos.EstimatedCitation DESC) AS CitationRank,
+           "All" AS TimeRange
+    FROM @paperEntityFos;
+
+
+//Calcuate 10yr Rank by Estimated Citations for HIndex calcuation in later step
+@paperEntityFos10yr =
+    SELECT @paperEntityFos. *,
+           ROW_NUMBER() OVER(PARTITION BY @paperEntityFos.FieldOfStudyId, @paperEntityFos.EntityId ORDER BY @paperEntityFos.EstimatedCitation DESC) AS CitationRank,
+           "10yr" AS TimeRange
+    FROM @paperEntityFos
+    WHERE @paperEntityFos.Year >= @thisYear - 10;
+
+
+//Calcuate 5yr Rank by Estimated Citations for HIndex calcuation in later step
+@paperEntityFos5yr =
+    SELECT @paperEntityFos. *,
+           ROW_NUMBER() OVER(PARTITION BY @paperEntityFos.FieldOfStudyId, @paperEntityFos.EntityId ORDER BY @paperEntityFos.EstimatedCitation DESC) AS CitationRank,
+           "5yr" AS TimeRange
+    FROM @paperEntityFos
+    WHERE @paperEntityFos.Year >= @thisYear - 5;
+
+
+//Union all time range result into a single table
+@paperEntityFosTimeRange =
+    SELECT *
+    FROM @paperEntityFosAll
+        UNION ALL
+    SELECT *
+    FROM @paperEntityFos10yr 
+        UNION ALL 
+    SELECT * FROM @paperEntityFos5yr;
+
+
+//Calculate Total RankScore, EstimatedCitation and HIndex for each [Field Of Study] -> [Entity] -> [TimeRange]
+@entityFosStats =
+    SELECT @paperEntityFosTimeRange.FieldOfStudyId,
+           @paperEntityFosTimeRange.EntityId,
+           @paperEntityFosTimeRange.TimeRange,
+           ANY_VALUE(@paperEntityFosTimeRange.EntityType) AS EntityType,
+           (double)SUM(@paperEntityFosTimeRange.RankScore) AS RankScore,
+           SUM(@paperEntityFosTimeRange.EstimatedCitation) AS EstimatedCitation,
+           MAX(@paperEntityFosTimeRange.EstimatedCitation >= @paperEntityFosTimeRange.CitationRank ? @paperEntityFosTimeRange.CitationRank : 0) AS HIndex 
+    FROM @paperEntityFosTimeRange
+    GROUP BY @paperEntityFosTimeRange.FieldOfStudyId,
+             @paperEntityFosTimeRange.EntityId,
+             @paperEntityFosTimeRange.TimeRange;
+
+
+//Rank each [Field Of Study] -> [Entity] -> [TimeRange] by Total RankScore, EstimatedCitation and HIndex
+@entityFosStats =
+    SELECT @entityFosStats. *,
+           RANK() OVER(PARTITION BY @entityFosStats.FieldOfStudyId, @entityFosStats.EntityType, @entityFosStats.TimeRange ORDER BY RankScore DESC) AS RankScore_Rank,
+           RANK() OVER(PARTITION BY @entityFosStats.FieldOfStudyId, @entityFosStats.EntityType, @entityFosStats.TimeRange ORDER BY EstimatedCitation DESC) AS EstimatedCitation_Rank,
+           RANK() OVER(PARTITION BY @entityFosStats.FieldOfStudyId, @entityFosStats.EntityType, @entityFosStats.TimeRange ORDER BY HIndex DESC) AS HIndex_Rank
+    FROM @entityFosStats;
+
+
+
+//Keep only top k entities for each field of study. 
+@entityFosStats =
+    SELECT FieldOfStudyId,
+           EntityId,
+           EntityType,
+           TimeRange,
+           Math.Log(RankScore)*1000*-1.0 AS Rank, //Restore rank to its orginal format           
+           EstimatedCitation,
+           HIndex
+    FROM @entityFosStats
+    WHERE @entityFosStats.RankScore_Rank <= @topKEntities 
+          OR @entityFosStats.EstimatedCitation_Rank <= @topKEntities 
+          OR @entityFosStats.HIndex_Rank <= @topKEntities;
+
+
+OUTPUT @entityFosStats
+TO @entityStats_fos_outpath
+USING Outputters.Tsv(outputHeader : true);
+
+
+//output all [FieldOfStudyId, Name] for easier lookup in visuals
+@fieldOfStudyDetails =
+    SELECT FieldOfStudyId,
+           NormalizedName AS Name
+    FROM FieldOfStudy;
+
+
+OUTPUT @fieldOfStudyDetails
+TO @fosDetails_outpath
+USING Outputters.Tsv(outputHeader : true);
+
+
+//Get all [EntityId, Name] for easier lookup in visuals
+@entityDetails =
+    SELECT Journal.JournalId AS EntityId,
+           Journal.DisplayName AS Name
+    FROM Journal
+        UNION ALL
+    SELECT ConferenceSeries.ConferenceSeriesId AS EntityId,
+           ConferenceSeries.NormalizedName AS Name
+    FROM ConferenceSeries
+        UNION ALL 
+    SELECT Affiliation.AffiliationId AS EntityId, 
+           Affiliation.DisplayName AS Name
+    FROM Affiliation 
+        UNION ALL 
+    SELECT Author.AuthorId AS EntityId, 
+           Author.DisplayName AS Name 
+    FROM Author;
+
+
+//Get all distinct EntityIds
+@distinctEntityIds =
+    SELECT DISTINCT EntityId
+    FROM @entityFosStats;
+
+
+//Only output [EntityId, Name] for top K entities
+@entityDetails =
+    SELECT @entityDetails.EntityId,
+           @entityDetails.Name
+    FROM @entityDetails
+         INNER JOIN
+             @distinctEntityIds
+         ON @entityDetails.EntityId == @distinctEntityIds.EntityId;
+
+
+OUTPUT @entityDetails
+TO @entityDetails_outpath
+USING Outputters.Tsv(outputHeader : true);
