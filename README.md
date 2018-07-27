@@ -14,7 +14,7 @@ This project aims to help data scientists become familar with the Microsoft Acad
 
 ## Samples
 
-The project contains 11 samples 
+The project contains 12 samples 
 
 * [Field of Study Top Authors](https://github.com/Azure-Samples/academic-knowledge-analytics-visualization/tree/master/src/AcademicAnalytics/01.%20Field%20of%20Study%20Top%20Authors)
 * [Field of Study Entity Counts](https://github.com/Azure-Samples/academic-knowledge-analytics-visualization/tree/master/src/AcademicAnalytics/11.%20Field%20of%20Study%20Entity%20Counts)
