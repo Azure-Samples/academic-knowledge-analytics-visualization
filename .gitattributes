@@ -38,12 +38,12 @@
 # image files are treated as binary by default.
 ###############################################################################
 #*.jpg   binary
-#*.png   binary
+*.png   binary
 #*.gif   binary
 ###############################################################################
 # behavior for Power BI files
 ###############################################################################
-#*.pbix   binary
+*.pbix   binary
 ###############################################################################
 # diff behavior for common document formats
 # 
@@ -61,4 +61,4 @@
 #*.PDF   diff=astextplain
 #*.rtf   diff=astextplain
 #*.RTF   diff=astextplain
-*.pbix filter=lfs diff=lfs merge=lfs -text
+#*.pbix filter=lfs diff=lfs merge=lfs -text
