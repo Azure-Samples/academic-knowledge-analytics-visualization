@@ -7,7 +7,8 @@ USE DATABASE AcdemicGraph;
 //*******************Input Variable Section********************************
 //        Change these variables for different calculations
 //*************************************************************************
-DECLARE @topKEntities = 5; //Output only top 5 entities
+DECLARE @topKEntities int = 5; //Output only top 5 entities
+DECLARE @fieldOfStudyLevelToInclude SQL.ARRAY<int> = new SQL.ARRAY<int>{0, 1};
 
 //*******************Constant Variable Section*****************************
 //        Defining const variables to be used by other parts of the script
@@ -37,6 +38,11 @@ DECLARE @fosDetails_outpath string = @outputBaseDir + "FOSDetails.tsv";
            Year
     FROM Paper;
 
+//Select target fields of study for ranking by field level
+@fosIds =
+    SELECT FieldOfStudyId
+    FROM FieldOfStudy
+    WHERE FieldOfStudy.Level IN @fieldOfStudyLevelToInclude;
 
 //Get all [Paper] -> [Field of Study] relationships along with paper/field details for later calculation
 @paperFos =
@@ -49,8 +55,8 @@ DECLARE @fosDetails_outpath string = @outputBaseDir + "FOSDetails.tsv";
            @papers.Year
     FROM PaperFieldOfStudy
          INNER JOIN
-             FieldOfStudy
-         ON PaperFieldOfStudy.FieldOfStudyId == FieldOfStudy.FieldOfStudyId
+             @fosIds
+         ON PaperFieldOfStudy.FieldOfStudyId == @fosIds.FieldOfStudyId
          INNER JOIN
              @papers
          ON PaperFieldOfStudy.PaperId == @papers.PaperId;
