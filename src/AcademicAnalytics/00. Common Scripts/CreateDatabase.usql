@@ -1,17 +1,17 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
-//Make sure to run "graph/<YYYY-MM-DD>/samples/CreateFunctions.usql" first!
+//Make sure to run "mag-prod-<YYYY-MM-DD>/samples/CreateFunctions.usql" first!
 
 //*******************Input Variable Section********************************
 //        Change these variables for different graph versions
 //*************************************************************************
-DECLARE @graphVersion string = "2018-07-10";
-
+DECLARE @graphVersion string = "2018-10-05";
+DECLARE @blobStorageAccountName string = "isrcbuildstore";
 //*******************Constant Variable Section*****************************
 //        Defining const variables to be used by other parts of the script
 //*************************************************************************
-DECLARE @graphDir   string = "/graph/" + @graphVersion + "/";
+DECLARE @graphDir string = "wasb://mag-prod-" + @graphVersion + "@" +  @blobStorageAccountName + "/";
 
 
 DROP DATABASE IF EXISTS AcdemicGraph; 
