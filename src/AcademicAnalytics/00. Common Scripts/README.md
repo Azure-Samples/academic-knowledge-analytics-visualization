@@ -7,165 +7,211 @@ This script creats a USQL database using same schema as the graph text files and
 > Note: &quot;Rank&quot; values in the entity files are the log probability of an entity being important multiplied by a constant(-1000).
 >Rank = -1000 \* Ln( probability of an entity being important )
 
-`Affiliations.txt`
+## Affiliations.txt
 
-| **Description** | **Type** |
-| --- | --- |
-| Affiliation ID | long |
-| Rank | uint |
-| Normalized name | string |
-| Display name | string |
-| Paper count | long? |
-| Citation count | long? |
+Column # | Name | Type | Note
+--- | --- | --- | ---
+1 | AffiliationId | long | PRIMARY KEY
+2 | Rank | uint |
+3 | NormalizedName | string |
+4 | DisplayName | string |
+5 | GridId | string |
+6 | OfficialPage | string |
+7 | WikiPage | string |
+8 | PaperCount | long |
+9 | CitationCount | long |
+10 | CreatedDate | DateTime |
 
-`Authors.txt`
+## Authors.txt
 
-| **Description** | **Type** |
-| --- | --- |
-| Author ID | long |
-| Rank | uint |
-| Normalized name | string |
-| Display name | string |
-| Last known affiliation ID | long? |
-| Paper count | long? |
-| Citation count | long? |
+Column # | Name | Type | Note
+--- | --- | --- | ---
+1 | AuthorId | long | PRIMARY KEY
+2 | Rank | uint |
+3 | NormalizedName | string |
+4 | DisplayName | string |
+5 | LastKnownAffiliationId | long? |
+6 | PaperCount | long |
+7 | CitationCount | long |
+8 | CreatedDate | DateTime |
 
-`ConferenceInstances.txt`
+## ConferenceInstances.txt
 
-| **Description** | **Type** |
-| --- | --- |
-| Conference instance ID | long |
-| Rank | uint |
-| Normalized name | string |
-| Display name | string |
-| Conference series ID | long? |
-| Location | string |
-| Official URL | string |
-| Start date | DateTime? |
-| End date | DateTime? |
-| Abstract registration date | DateTime? |
-| Submission deadline date | DateTime? |
-| Notification due date | DateTime? |
-| Final version due date | DateTime? |
-| Paper count | long? |
-| Citation count | long? |
+Column # | Name | Type | Note
+--- | --- | --- | ---
+1 | ConferenceInstanceId | long | PRIMARY KEY
+2 | NormalizedName | string |
+3 | DisplayName | string |
+4 | ConferenceSeriesId | long | FOREIGN KEY REFERENCES ConferenceSeries(ConferenceSeriesId)
+5 | Location | string |
+6 | OfficialUrl | string |
+7 | StartDate | DateTime? |
+8 | EndDate | DateTime? |
+9 | AbstractRegistrationDate | DateTime? |
+10 | SubmissionDeadlineDate | DateTime? |
+11 | NotificationDueDate | DateTime? |
+12 | FinalVersionDueDate | DateTime? |
+13 | PaperCount | long |
+14 | CitationCount | long |
+15 | CreatedDate | DateTime |
 
-`ConferenceSeries.txt`
+## ConferenceSeries.txt
 
-| **Description** | **Type** |
-| --- | --- |
-| Conference series ID | long |
-| Rank | uint |
-| Normalized name | string |
-| Display name | string |
-| Paper count | long? |
-| Citation count | long? |
+Column # | Name | Type | Note
+--- | --- | --- | ---
+1 | ConferenceSeriesId | long | PRIMARY KEY
+2 | Rank | uint |
+3 | NormalizedName | string |
+4 | DisplayName | string |
+5 | PaperCount | long |
+6 | CitationCount | long |
+7 | CreatedDate | DateTime |
 
-`FieldsOfStudy.txt`
+## FieldsOfStudyChildren.txt
 
-| **Description** | **Type** |
-| --- | --- |
-| Field of study ID | long |
-| Rank | uint |
-| Normalized name | string |
-| Display name | string |
-| Level | Int |
-| Paper count | long? |
-| Citation count | long? |
+Column # | Name | Type | Note
+--- | --- | --- | ---
+1 | FieldOfStudyId | long | FOREIGN KEY REFERENCES FieldsOfStudy(FieldOfStudyId)
+2 | ChildFieldOfStudyId | long | FOREIGN KEY REFERENCES FieldsOfStudy(FieldOfStudyId)
 
-`FieldsOfStudyChildren.txt`
+## FieldsOfStudy.txt
 
-| **Description** | **Type** |
-| --- | --- |
-| Field of study ID | long |
-| Child field of study ID | long |
+Column # | Name | Type | Note
+--- | --- | --- | ---
+1 | FieldOfStudyId | long | PRIMARY KEY
+2 | Rank | uint |
+3 | NormalizedName | string |
+4 | DisplayName | string |
+5 | MainType | string |
+6 | Level | Int | 0 - 5
+7 | PaperCount | long |
+8 | CitationCount | long |
+9 | CreatedDate | DateTime |
 
-`Journals.txt`
+## Journals.txt
 
-| **Description** | **Type** |
-| --- | --- |
-| Journal ID | long |
-| Rank | uint |
-| Normalized name | string |
-| Display name | string |
-| Paper count | long? |
-| Citation count | long? |
+Column # | Name | Type | Note
+--- | --- | --- | ---
+1 | JournalId| long | PRIMARY KEY
+2 | Rank | uint |
+3 | NormalizedName | string |
+4 | DisplayName | string |
+5 | Issn | string |
+6 | Publisher | string |
+7 | Webpage | string |
+8 | PaperCount | long |
+9 | CitationCount | long |
+10 | CreatedDate | DateTime |
 
-`Papers.txt`
+## PaperAbstractInvertedIndex.txt
 
-| **Description** | **Type** |
-| --- | --- |
-| Paper ID | long |
-| Rank | uint |
-| DOI | string |
-| Doc type | string |
-| Paper title | string |
-| Original title | string |
-| Book title | string |
-| Year | int |
-| Date | DateTimr? |
-| Publisher | string |
-| Journal ID | long? |
-| Conference series ID | long? |
-| Conference instance ID | long? |
-| Volume | string |
-| Issue | string |
-| First page | string |
-| Last page | string |
-| Reference count | long |
-| Citation count | long? |
-| Estimated citation count | int? |
+Column # | Name | Type | Note
+--- | --- | --- | ---
+1 | PaperId | long | FOREIGN KEY REFERENCES Papers(PaperId)
+2 | IndexedAbstract | string | See [Microsoft Academic Graph FAQ](resources-faq)
 
-`PaperAbstractInvertedIndex.txt`
+## PaperAuthorAffiliations.txt
 
-| **Description** | **Type** |
-| --- | --- |
-| Paper ID | long |
-| Indexed abstract | string |
+Column # | Name | Type | Note
+--- | --- | --- | ---
+1 | PaperId | long | FOREIGN KEY REFERENCES Papers(PaperId)
+2 | AuthorId | long | FOREIGN KEY REFERENCES Authors(AuthorId)
+3 | AffiliationId | long? | FOREIGN KEY REFERENCES Affiliations(AffiliationId)
+4 | AuthorSequenceNumber | uint | 1-based author sequence number. 1: the 1st author listed on paper.
+5 | OriginalAffiliation | string |
 
-`PaperAuthorAffiliations.txt`
+> [!NOTE]
+> It is possible to have multiple rows with same (PaperId, AuthorId, AffiliationId) when an author is associated with multiple affiliations.
 
-| **Description** | **Type** |
-| --- | --- |
-| Paper ID | long |
-| Author ID | long |
-| Affiliation ID | long? |
-| Author sequence number | uint |
+## PaperCitationContexts.txt
 
-`PaperCitationContexts.txt`
+Column # | Name | Type | Note
+--- | --- | --- | ---
+1 | PaperId | long | FOREIGN KEY REFERENCES Papers(PaperId)
+2 | PaperReferenceId | long | FOREIGN KEY REFERENCES Papers(PaperId)
+3 | CitationContext | string |
 
-| **Description** | **Type** |
-| --- | --- |
-| Paper ID | long |
-| Paper reference ID | long |
-| Citation context | string |
+## PaperFieldsOfStudy.txt
 
-`PaperFieldsOfStudy.txt`
+Column # | Name | Type | Note
+--- | --- | --- | ---
+1 | PaperId | long | FOREIGN KEY REFERENCES Papers(PaperId)
+2 | FieldOfStudyId | long | FOREIGN KEY REFERENCES FieldsOfStudy(FieldOfStudyId)
+3 | Score | float | Confidence range between 0 and 1. Bigger number representing higher confidence.
 
-| **Description** | **Type** |
-| --- | --- |
-| Paper ID | long |
-| Field of study ID | long |
-| Similarity | float |
+## PaperLanguages.txt
 
-`PaperLanguages.txt`
+Column # | Name | Type | Note
+--- | --- | --- | ---
+1 | PaperId | long | FOREIGN KEY REFERENCES Papers(PaperId)
+2 | LanguageCode | string |
 
-| **Description** | **Type** |
-| --- | --- |
-| Paper ID | long |
-| Language code | string |
+## PaperRecommendations.txt
 
-`PaperReferences.txt`
+Column # | Name | Type | Note
+--- | --- | --- | ---
+1 | PaperId | long | FOREIGN KEY REFERENCES Papers(PaperId)
+2 | RecommendedPaperId | long | FOREIGN KEY REFERENCES Papers(PaperId)
+3 | Score | float | Confidence range between 0 and 1. Bigger number representing higher confidence.
 
-| **Description** | **Type** |
-| --- | --- |
-| Paper ID | long |
-| Paper reference ID | long |
+## PaperReferences.txt
 
-`PaperUrls.txt`
+Column # | Name | Type | Note
+--- | --- | --- | ---
+1 | PaperId | long | FOREIGN KEY REFERENCES Papers(PaperId)
+2 | PaperReferenceId | long | FOREIGN KEY REFERENCES Papers(PaperId)
 
-| **Description** | **Type** |
-| --- | --- |
-| Paper ID | long |
-| Source type | int? |
-| Source URL | string |
+## PaperResources.txt
+
+Column # | Name | Type | Note
+--- | --- | --- | ---
+1 | PaperId | long | FOREIGN KEY REFERENCES Papers(PaperId)
+2 | ResourceType | int |
+3 | ResourceUrl | string | Bit flags. 1 = Project, 2 = Data, 4 = Code
+4 | SourceUrl | string |
+5 | RelationshipType | int | Bit flags. 1 = Own, 2 = Cite
+
+## PaperUrls.txt
+
+Column # | Name | Type | Note
+--- | --- | --- | ---
+1 | PaperId | long | FOREIGN KEY REFERENCES Papers(PaperId)
+2 | SourceType | int? |
+3 | SourceUrl | string |
+
+## Papers.txt
+
+Column # | Name | Type | Note
+--- | --- | --- | ---
+1 | PaperId | long | PRIMARY KEY
+2 | Rank | uint |
+3 | Doi | string |
+4 | DocType | string | Book, BookChapter, Conference, Journal, Patent, NULL : unknown
+5 | PaperTitle | string |
+6 | OriginalTitle | string |
+7 | BookTitle | string |
+8 | Year | int |
+9 | Date | DateTime? |
+10 | Publisher | string |
+11 | JournalId | long? | FOREIGN KEY REFERENCES Journals(JournalId)
+12 | ConferenceSeriesId | long? | FOREIGN KEY REFERENCES ConferenceSeries(ConferenceSeriesId)
+13 | ConferenceInstanceId | long? | FOREIGN KEY REFERENCES ConferenceInstances(ConferenceInstanceId)
+14 | Volume | string |
+15 | Issue | string |
+16 | FirstPage | string |
+17 | LastPage | string |
+18 | ReferenceCount | long |
+19 | CitationCount | long |
+20 | EstimatedCitationCount | long |
+21 | OriginalVenue | string |
+22 | CreatedDate | DateTime |
+
+## RelatedFieldOfStudy.txt
+
+Column # | Name | Type | Note
+--- | --- | --- | ---
+1 | FieldOfStudyId1 | long | FOREIGN KEY REFERENCES FieldsOfStudy(FieldOfStudyId)
+2 | Type1 | string | disease, disease_cause, medical_treatment, symptom
+3 | FieldOfStudyId2 | long | FOREIGN KEY REFERENCES FieldsOfStudy(FieldOfStudyId)
+4 | Type2 | string | disease, disease_cause, medical_treatment, symptom
+5 | Rank | float | Confidence range between 0 and 1. Bigger number representing higher confidence.
