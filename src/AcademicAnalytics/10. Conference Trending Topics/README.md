@@ -9,7 +9,7 @@ This sample code illustrates how to find trending topics for a partitular confer
 
 ### ConferenceFieldsOfStudyByCitationGrowthRate.usql
 
-Every paper has associated field of study when published. This script illustrates how calcuate Normalized Citation Growth Rate for fields of study that appeared in a given conference series.
+Every paper in MAG has associated fields of study. We can find trending topics for a conference series by aggregating its papers. This script illustrates how calcuate Normalized Citation Growth Rate for fields of study that appeared in a given conference series.
 
 
 #### Input Parameters
@@ -48,8 +48,8 @@ The script should output two tsv with headers. Here's what to expect
 
 ### ConferenceTrendingTopics.pbit
 
-The template visualizes the results using a two line charts to illustrate the compare the trending topics publication/citation count over time.
-Additional slicer to select which field level to show on the line chart. 
+The template visualizes the results using two line charts to compare trending topics' publication/citation count over time.
+The template also has an additional slicer to filter trending topics by their field level for better comparison. 
  
 
 #### Template Parameters
@@ -61,7 +61,7 @@ Additional slicer to select which field level to show on the line chart.
 
 ### ConferenceTrendingTopics (WWW).pbix
 
-This Power BI report file is for comparison. If you run the script as is then use ConferenceOutgoingReferences.pbit to create a Power BI report, the visualization and interaction should be indentical. 
+This Power BI report file is for comparison. If you run the script as is then use ConferenceTrendingTopics.pbit to create a Power BI report, the visualization and interaction should be indentical. 
 
 ## Resources
 

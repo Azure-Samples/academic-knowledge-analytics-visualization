@@ -22,20 +22,20 @@ DECLARE @fosDetails_outpath string =  @outputBaseDir + "fosDetails.tsv";
 
 //Get all [Paper] -> [FieldOfStudy] -> [Author] -> [Affiliation] relationships
 @paperAuthorAffiliationFieldsOfStudy =
-    SELECT PaperFieldOfStudy.FieldOfStudyId,
-           PaperFieldOfStudy.PaperId,
-           PaperAuthorAffiliation.AuthorId,
-           PaperAuthorAffiliation.AffiliationId,
-           Paper.JournalId,
-           Paper.ConferenceSeriesId,
-           Paper.Year
-    FROM Paper
+    SELECT PaperFieldsOfStudy.FieldOfStudyId,
+           PaperFieldsOfStudy.PaperId,
+           PaperAuthorAffiliations.AuthorId,
+           PaperAuthorAffiliations.AffiliationId,
+           Papers.JournalId,
+           Papers.ConferenceSeriesId,
+           Papers.Year
+    FROM Papers
          INNER JOIN
-             PaperFieldOfStudy
-         ON Paper.PaperId == PaperFieldOfStudy.PaperId
+             PaperFieldsOfStudy
+         ON Papers.PaperId == PaperFieldsOfStudy.PaperId
          INNER JOIN
-             PaperAuthorAffiliation
-         ON Paper.PaperId == PaperAuthorAffiliation.PaperId;
+             PaperAuthorAffiliations
+         ON Papers.PaperId == PaperAuthorAffiliations.PaperId;
 
 
 //Get distinct affiliation, author, journal and confernece count for each field of study by year
@@ -87,7 +87,7 @@ USING Outputters.Tsv(outputHeader : true);
 @fieldsOfStudy =
     SELECT FieldOfStudyId,
            NormalizedName AS Name
-    FROM FieldOfStudy;
+    FROM FieldsOfStudy;
 
 
 OUTPUT @fieldsOfStudy

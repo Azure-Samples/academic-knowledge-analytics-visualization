@@ -34,16 +34,16 @@ DECLARE @conferenceTopPapersOutPath string = @outputBaseDir + "conferenceTopPape
 
 //Get all conference papers by conference series Id.
 @conferencePapers =
-    SELECT Paper.PaperId,
-           Paper.OriginalTitle,
-           Paper.Year,
-           Paper.CitationCount,
-           Paper.EstimatedCitationCount, //Will use estimated citation count to select top papers
-           Paper.ConferenceSeriesId AS VenueId
-    FROM Paper
+    SELECT Papers.PaperId,
+           Papers.OriginalTitle,
+           Papers.Year,
+           Papers.CitationCount,
+           Papers.EstimatedCitation, //Will use estimated citation count to select top papers
+           Papers.ConferenceSeriesId AS VenueId
+    FROM Papers
          INNER JOIN
              @targetConferenceSeriesId
-         ON Paper.ConferenceSeriesId == @targetConferenceSeriesId.ConferenceSeriesId;
+         ON Papers.ConferenceSeriesId == @targetConferenceSeriesId.ConferenceSeriesId;
 
 
 //Select top conference papers based on estimated citation count
@@ -52,9 +52,9 @@ DECLARE @conferenceTopPapersOutPath string = @outputBaseDir + "conferenceTopPape
            @conferencePapers.OriginalTitle,
            @conferencePapers.Year,
            @conferencePapers.CitationCount,
-           @conferencePapers.EstimatedCitationCount
+           @conferencePapers.EstimatedCitation AS EstimatedCitationCount
     FROM @conferencePapers
-ORDER BY  @conferencePapers.EstimatedCitationCount DESC
+ORDER BY  @conferencePapers.EstimatedCitation DESC
 FETCH @conferenceTopPapersCount ROWS;
 
 

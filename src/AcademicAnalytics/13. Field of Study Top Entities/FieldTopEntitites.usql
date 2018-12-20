@@ -36,30 +36,30 @@ DECLARE @fosDetails_outpath string = @outputBaseDir + "FOSDetails.tsv";
            Math.Exp((double) Rank * ( - 1.0) / 1000) AS RankScore,
            EstimatedCitation,
            Year
-    FROM Paper;
+    FROM Papers;
 
 //Select target fields of study for ranking by field level
 @fosIds =
     SELECT FieldOfStudyId
-    FROM FieldOfStudy
-    WHERE FieldOfStudy.Level IN @fieldOfStudyLevelToInclude;
+    FROM FieldsOfStudy
+    WHERE FieldsOfStudy.Level IN @fieldOfStudyLevelToInclude;
 
 //Get all [Paper] -> [Field of Study] relationships along with paper/field details for later calculation
 @paperFos =
-    SELECT PaperFieldOfStudy.PaperId,
-           PaperFieldOfStudy.FieldOfStudyId,
+    SELECT PaperFieldsOfStudy.PaperId,
+           PaperFieldsOfStudy.FieldOfStudyId,
            @papers.JournalId,
            @papers.ConferenceSeriesId,
            @papers.RankScore,
            @papers.EstimatedCitation,
            @papers.Year
-    FROM PaperFieldOfStudy
+    FROM PaperFieldsOfStudy
          INNER JOIN
              @fosIds
-         ON PaperFieldOfStudy.FieldOfStudyId == @fosIds.FieldOfStudyId
+         ON PaperFieldsOfStudy.FieldOfStudyId == @fosIds.FieldOfStudyId
          INNER JOIN
              @papers
-         ON PaperFieldOfStudy.PaperId == @papers.PaperId;
+         ON PaperFieldsOfStudy.PaperId == @papers.PaperId;
 
 
 //Get all [Journal] -> [Paper] -> [Field of Study] relationships
@@ -90,15 +90,15 @@ WHERE @paperFos.ConferenceSeriesId != null;
 @paperAuthorAffiliationFos =
     SELECT @paperFos.PaperId,
            @paperFos.FieldOfStudyId,
-           PaperAuthorAffiliation.AuthorId,
-           PaperAuthorAffiliation.AffiliationId,
+           PaperAuthorAffiliations.AuthorId,
+           PaperAuthorAffiliations.AffiliationId,
            @paperFos.RankScore,
            @paperFos.EstimatedCitation,
            @paperFos.Year
     FROM @paperFos
          JOIN
-             PaperAuthorAffiliation
-         ON @paperFos.PaperId == PaperAuthorAffiliation.PaperId;
+             PaperAuthorAffiliations
+         ON @paperFos.PaperId == PaperAuthorAffiliations.PaperId;
 
 
 //Get all [Paper] -> [Author] relationships
@@ -229,7 +229,7 @@ USING Outputters.Tsv(outputHeader : true);
 @fieldOfStudyDetails =
     SELECT FieldOfStudyId,
            NormalizedName AS Name
-    FROM FieldOfStudy;
+    FROM FieldsOfStudy;
 
 
 OUTPUT @fieldOfStudyDetails
@@ -239,21 +239,21 @@ USING Outputters.Tsv(outputHeader : true);
 
 //Get all [EntityId, Name] for easier lookup in visuals
 @entityDetails =
-    SELECT Journal.JournalId AS EntityId,
-           Journal.DisplayName AS Name
-    FROM Journal
+    SELECT Journals.JournalId AS EntityId,
+           Journals.DisplayName AS Name
+    FROM Journals
         UNION ALL
     SELECT ConferenceSeries.ConferenceSeriesId AS EntityId,
            ConferenceSeries.NormalizedName AS Name
     FROM ConferenceSeries
         UNION ALL 
-    SELECT Affiliation.AffiliationId AS EntityId, 
-           Affiliation.DisplayName AS Name
-    FROM Affiliation 
+    SELECT Affiliations.AffiliationId AS EntityId, 
+           Affiliations.DisplayName AS Name
+    FROM Affiliations 
         UNION ALL 
-    SELECT Author.AuthorId AS EntityId, 
-           Author.DisplayName AS Name 
-    FROM Author;
+    SELECT Authors.AuthorId AS EntityId, 
+           Authors.DisplayName AS Name 
+    FROM Authors;
 
 
 //Get all distinct EntityIds

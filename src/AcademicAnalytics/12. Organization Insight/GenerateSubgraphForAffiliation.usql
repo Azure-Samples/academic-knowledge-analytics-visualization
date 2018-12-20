@@ -38,7 +38,7 @@ DECLARE @fieldOfStudyOutPath string = @outputBaseDir + "FieldOfStudy.tsv";
     SELECT 
         AffiliationId, 
         DisplayName AS AffiliationName
-    FROM Affiliation
+    FROM Affiliations
     WHERE NormalizedName == @organizationName;
 
 
@@ -54,14 +54,14 @@ USING Outputters.Tsv(outputHeader:true);
 
 //Get all [Paper]->[Author]->[Affiliation(input organization] relationships
 @orgPaperAuthorAffiliation =
-    SELECT PaperAuthorAffiliation.PaperId,
-           PaperAuthorAffiliation.AuthorId,
+    SELECT PaperAuthorAffiliations.PaperId,
+           PaperAuthorAffiliations.AuthorId,
            @targetAffiliationId.AffiliationId,
-           PaperAuthorAffiliation.AuthorSequenceNumber
-    FROM PaperAuthorAffiliation
+           PaperAuthorAffiliations.AuthorSequenceNumber
+    FROM PaperAuthorAffiliations
          INNER JOIN
              @targetAffiliationId
-         ON PaperAuthorAffiliation.AffiliationId == @targetAffiliationId.AffiliationId;
+         ON PaperAuthorAffiliations.AffiliationId == @targetAffiliationId.AffiliationId;
 
 
 OUTPUT @orgPaperAuthorAffiliation
@@ -78,11 +78,11 @@ USING Outputters.Tsv(outputHeader:true);
 //Get all org author details
 @orgAuthors =
     SELECT @orgAuthorIds.AuthorId,
-           Author.DisplayName AS AuthorName
-    FROM Author
+           Authors.DisplayName AS AuthorName
+    FROM Authors
          INNER JOIN
              @orgAuthorIds
-         ON Author.AuthorId == @orgAuthorIds.AuthorId;
+         ON Authors.AuthorId == @orgAuthorIds.AuthorId;
 
 
 OUTPUT @orgAuthors
@@ -98,20 +98,20 @@ USING Outputters.Tsv(outputHeader:true);
 
 //Get all org paper details
 @orgPapers =
-    SELECT Paper.PaperId,
-           Paper.PaperTitle AS Title,
-           Paper.EstimatedCitation AS CitationCount,
-           Paper.Date,
+    SELECT Papers.PaperId,
+           Papers.PaperTitle AS Title,
+           Papers.EstimatedCitation AS CitationCount,
+           Papers.Date,
            //Use "Not avaliable" to represent the publication type if it is unknown.
-           String.IsNullOrEmpty(Paper.DocType) ? "Not avaliable" : Paper.DocType AS PublicationType,
-           Math.Exp(Paper.Rank * -0.001) AS LogProb,
-           @maDetailPagePrefix + Paper.PaperId AS Url,
-           Paper.ConferenceSeriesId == null ? Paper.JournalId : Paper.ConferenceSeriesId AS VId,
+           String.IsNullOrEmpty(Papers.DocType) ? "Not avaliable" : Papers.DocType AS PublicationType,
+           Math.Exp(Papers.Rank * -0.001) AS LogProb,
+           @maDetailPagePrefix + Papers.PaperId AS Url,
+           Papers.ConferenceSeriesId == null ? Papers.JournalId : Papers.ConferenceSeriesId AS VId,
            Year
-    FROM Paper
+    FROM Papers
          INNER JOIN
              @orgPaperIds
-         ON Paper.PaperId == @orgPaperIds.PaperId
+         ON Papers.PaperId == @orgPaperIds.PaperId
     WHERE Year >= @organizationPaperMinYear;
 
 
@@ -123,13 +123,13 @@ USING Outputters.Tsv(outputHeader:true);
 //Get all [Paper]->[Author/Affiliation] relationships for the org
 @orgAllPaperAuthorAffiliations =
     SELECT @orgPapers.PaperId,
-           PaperAuthorAffiliation.AuthorId,
-           PaperAuthorAffiliation.AffiliationId,
-           PaperAuthorAffiliation.AuthorSequenceNumber
-    FROM PaperAuthorAffiliation
+           PaperAuthorAffiliations.AuthorId,
+           PaperAuthorAffiliations.AffiliationId,
+           PaperAuthorAffiliations.AuthorSequenceNumber
+    FROM PaperAuthorAffiliations
          JOIN
              @orgPapers
-         ON PaperAuthorAffiliation.PaperId == @orgPapers.PaperId;
+         ON PaperAuthorAffiliations.PaperId == @orgPapers.PaperId;
 
 
 //All distinct affiliation id from [Paper] -> [Author/Affiliation] relationship are the partner affiliations
@@ -165,11 +165,11 @@ USING Outputters.Tsv(outputHeader:true);
 //Get all partner orgs' affiliation details
 @orgPartnerAffiliations =
     SELECT @orgPartnerAffiliationIds.AffiliationId,
-           Affiliation.DisplayName AS AffiliationName
-    FROM Affiliation
+           Affiliations.DisplayName AS AffiliationName
+    FROM Affiliations
          INNER JOIN
              @orgPartnerAffiliationIds
-         ON Affiliation.AffiliationId == @orgPartnerAffiliationIds.AffiliationId;
+         ON Affiliations.AffiliationId == @orgPartnerAffiliationIds.AffiliationId;
 
 
 OUTPUT @orgPartnerAffiliations
@@ -186,11 +186,11 @@ USING Outputters.Tsv(outputHeader:true);
 //Get all partner authors' details
 @orgPartnerAuthors =
     SELECT @orgPartnerAuthorIds.AuthorId,
-           Author.DisplayName AS AuthorName
-    FROM Author
+           Authors.DisplayName AS AuthorName
+    FROM Authors
          INNER JOIN
              @orgPartnerAuthorIds
-         ON Author.AuthorId == @orgPartnerAuthorIds.AuthorId;
+         ON Authors.AuthorId == @orgPartnerAuthorIds.AuthorId;
 
 
 OUTPUT @orgPartnerAuthors
@@ -201,11 +201,11 @@ USING Outputters.Tsv(outputHeader:true);
 //Get all [Paper]->[Field of Study] relationships for the input organization
 @orgPaperFieldOfStudy =
     SELECT @orgPapers.PaperId,
-           PaperFieldOfStudy.FieldOfStudyId
-    FROM PaperFieldOfStudy
+           PaperFieldsOfStudy.FieldOfStudyId
+    FROM PaperFieldsOfStudy
          INNER JOIN
              @orgPapers
-         ON PaperFieldOfStudy.PaperId == @orgPapers.PaperId;
+         ON PaperFieldsOfStudy.PaperId == @orgPapers.PaperId;
 
 
 OUTPUT @orgPaperFieldOfStudy
@@ -222,12 +222,12 @@ USING Outputters.Tsv(outputHeader:true);
 //Get all fields of study details for the input organization
 @fieldOfStudyOut =
     SELECT @orgFieldOfStudyIds.FieldOfStudyId,
-           FieldOfStudy.Level AS FieldLevel,
-           FieldOfStudy.DisplayName AS FieldName
-    FROM FieldOfStudy
+           FieldsOfStudy.Level AS FieldLevel,
+           FieldsOfStudy.DisplayName AS FieldName
+    FROM FieldsOfStudy
          INNER JOIN
              @orgFieldOfStudyIds
-         ON FieldOfStudy.FieldOfStudyId == @orgFieldOfStudyIds.FieldOfStudyId;
+         ON FieldsOfStudy.FieldOfStudyId == @orgFieldOfStudyIds.FieldOfStudyId;
 
 
 OUTPUT @fieldOfStudyOut
@@ -245,7 +245,7 @@ UNION
     SELECT JournalId AS VId,
            DisplayName AS VenueName,
            NormalizedName AS VenueShortName
-    FROM Journal;
+    FROM Journals;
 
 
 OUTPUT @venue

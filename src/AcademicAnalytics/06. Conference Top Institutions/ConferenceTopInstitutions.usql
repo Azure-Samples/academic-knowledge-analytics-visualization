@@ -33,27 +33,27 @@ DECLARE @conferenceTopInstitutionsOutPath string = @outputBaseDir + "conferenceT
 
 //Get all conference papers by conference series Id.
 @conferencePapers =
-    SELECT Paper.PaperId,
-           Paper.CitationCount,
-           Paper.ConferenceSeriesId
-    FROM Paper
+    SELECT Papers.PaperId,
+           Papers.CitationCount,
+           Papers.ConferenceSeriesId
+    FROM Papers
          INNER JOIN
              @targetConferenceSeriesId
-         ON Paper.ConferenceSeriesId == @targetConferenceSeriesId.ConferenceSeriesId;
+         ON Papers.ConferenceSeriesId == @targetConferenceSeriesId.ConferenceSeriesId;
 
 
 //Get all [paper] -> [affiliation] relationship from [paper] -> [author, affiliation]
 @paperAffiliation =
     SELECT PaperId,
            (long) AffiliationId AS AffiliationId //Saftely cast from long? to long 
-    FROM PaperAuthorAffiliation
+    FROM PaperAuthorAffiliations
     WHERE AffiliationId IS NOT NULL; 
 
 
 //Get all distinct [conference paper] -> [affiliation] relationships
 @conferenceAffiliationsPapers =
-    SELECT ANY_VALUE(Affiliation.DisplayName) AS InstitutionName,
-           Affiliation.AffiliationId,
+    SELECT ANY_VALUE(Affiliations.DisplayName) AS InstitutionName,
+           Affiliations.AffiliationId,
            @conferencePapers.PaperId,
            ANY_VALUE(@conferencePapers.CitationCount) AS CitationCount
     FROM @conferencePapers
@@ -61,11 +61,11 @@ DECLARE @conferenceTopInstitutionsOutPath string = @outputBaseDir + "conferenceT
              @paperAffiliation
          ON @conferencePapers.PaperId == @paperAffiliation.PaperId
          INNER JOIN
-             Affiliation
-         ON @paperAffiliation.AffiliationId == Affiliation.AffiliationId
+             Affiliations
+         ON @paperAffiliation.AffiliationId == Affiliations.AffiliationId
     //Each paper may have mutiple authors from the same institution.
     //We want to have distinct [conference paper] -> [affiliation] relationships so we don't double count
-    GROUP BY @conferencePapers.PaperId, Affiliation.AffiliationId;
+    GROUP BY @conferencePapers.PaperId, Affiliations.AffiliationId;
 
 
 //Get top institution by its all time citation count

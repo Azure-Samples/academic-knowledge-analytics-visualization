@@ -34,27 +34,27 @@ DECLARE @authorRankOutPath string = @outputBaseDir + "conferenceTopAuthorsByStat
 
 //Get all conference papers by conference series Id.
 @conferencePapers =
-    SELECT Paper.PaperId,
-           (Paper.Rank * -0.001) AS LogProbRank //Rank is stored in the graph as LogProbRank*-1000
-    FROM Paper
+    SELECT Papers.PaperId,
+           (Papers.Rank * -0.001) AS LogProbRank //Rank is stored in the graph as LogProbRank*-1000
+    FROM Papers
          INNER JOIN
              @targetConferenceSeriesId
-         ON Paper.ConferenceSeriesId == @targetConferenceSeriesId.ConferenceSeriesId;
+         ON Papers.ConferenceSeriesId == @targetConferenceSeriesId.ConferenceSeriesId;
 
 
 //Get all [conference paper] -> [conference author] relationships
 @conferenceAuthorsPapers =
-    SELECT Author.DisplayName AS AuthorName,
-           Author.AuthorId,
+    SELECT Authors.DisplayName AS AuthorName,
+           Authors.AuthorId,
            @conferencePapers.PaperId,
            @conferencePapers.LogProbRank AS LogProbRank 
     FROM @conferencePapers
          INNER JOIN
-             PaperAuthorAffiliation
-         ON @conferencePapers.PaperId == PaperAuthorAffiliation.PaperId
+             PaperAuthorAffiliations
+         ON @conferencePapers.PaperId == PaperAuthorAffiliations.PaperId
          INNER JOIN
-             Author
-         ON PaperAuthorAffiliation.AuthorId == Author.AuthorId;
+             Authors
+         ON PaperAuthorAffiliations.AuthorId == Authors.AuthorId;
 
 
 //Aggregate static rank and publication for each author 

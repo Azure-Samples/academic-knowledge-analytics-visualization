@@ -27,22 +27,22 @@ DECLARE @fieldTopAuthorsOutPath string = @outputBaseDir + @"topAuthors.tsv";
 
 //Get all paperIds for the field
 @fieldPaperIds =
-    SELECT PaperFieldOfStudy.PaperId
-    FROM FieldOfStudy
+    SELECT PaperFieldsOfStudy.PaperId
+    FROM FieldsOfStudy
          INNER JOIN
-             PaperFieldOfStudy
-         ON FieldOfStudy.FieldOfStudyId == PaperFieldOfStudy.FieldOfStudyId
-    WHERE FieldOfStudy.NormalizedName == @fieldName;
+             PaperFieldsOfStudy
+         ON FieldsOfStudy.FieldOfStudyId == PaperFieldsOfStudy.FieldOfStudyId
+    WHERE FieldsOfStudy.NormalizedName == @fieldName;
 
 
 //Get all [citing paper] -> [field paper] relationships
 @fieldCitations =
-    SELECT PaperReference.PaperId,
-           PaperReference.PaperReferenceId 
-    FROM PaperReference
+    SELECT PaperReferences.PaperId,
+           PaperReferences.PaperReferenceId 
+    FROM PaperReferences
          INNER JOIN
              @fieldPaperIds
-         ON @fieldPaperIds.PaperId == PaperReference.PaperReferenceId;
+         ON @fieldPaperIds.PaperId == PaperReferences.PaperReferenceId;
 
 
 //For each field paper, count incoming reference to get citation count
@@ -55,21 +55,21 @@ DECLARE @fieldTopAuthorsOutPath string = @outputBaseDir + @"topAuthors.tsv";
 
 //Get top authors by citation count
 @fieldAuthors =
-    SELECT Author.AuthorId,
-           ANY_VALUE(Author.DisplayName) AS AuthorName, //Guaranteed to have only 1 value since AuthorId is the key
+    SELECT Authors.AuthorId,
+           ANY_VALUE(Authors.DisplayName) AS AuthorName, //Guaranteed to have only 1 value since AuthorId is the key
            COUNT( @fieldPapersWithCitationCount.PaperId ) AS PublicationCount,
            SUM(@fieldPapersWithCitationCount.CitationCount) AS CitationCount
     FROM @fieldPapersWithCitationCount
          //First join against PaperAuthorAffiliation to get field paper -> field author relationship.
          JOIN
-             PaperAuthorAffiliation
-         ON PaperAuthorAffiliation.PaperId == @fieldPapersWithCitationCount.PaperId
+             PaperAuthorAffiliations
+         ON PaperAuthorAffiliations.PaperId == @fieldPapersWithCitationCount.PaperId
          //Then join against Author to get detail author information.
          JOIN
-            Author    
-         ON PaperAuthorAffiliation.AuthorId == Author.AuthorId
+            Authors   
+         ON PaperAuthorAffiliations.AuthorId == Authors.AuthorId
     //Aggregate over authorId to cacluate publication/ciation count for each author
-    GROUP BY Author.AuthorId
+    GROUP BY Authors.AuthorId
     ORDER BY CitationCount DESC
     FETCH @fieldTopAuthorsCount ROWS;
 

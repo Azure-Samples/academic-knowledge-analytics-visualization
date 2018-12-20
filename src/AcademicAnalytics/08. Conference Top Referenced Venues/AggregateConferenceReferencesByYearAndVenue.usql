@@ -35,10 +35,10 @@ DECLARE @conferenceYearlyReferenceVenueOutPath string = @outputBaseDir + "confer
     FROM ConferenceSeries
     //All entity Ids should be distinct. (ConferenceSeriesId and JournalId won't collide) Using union all here for better performance          
     UNION ALL
-    SELECT Journal.JournalId AS VenueId,
-           Journal.NormalizedName AS VenueShortName,
-           Journal.DisplayName AS VenueName
-    FROM Journal;
+    SELECT Journals.JournalId AS VenueId,
+           Journals.NormalizedName AS VenueShortName,
+           Journals.DisplayName AS VenueName
+    FROM Journals;
 
 
 OUTPUT @venues
@@ -55,13 +55,13 @@ USING Outputters.Tsv(outputHeader : true);
 
 //Get all conference papers by conference series Id.
 @conferencePapers =
-    SELECT Paper.PaperId,
-           Paper.Year,
-           Paper.ConferenceSeriesId AS VenueId
-    FROM Paper
+    SELECT Papers.PaperId,
+           Papers.Year,
+           Papers.ConferenceSeriesId AS VenueId
+    FROM Papers
          INNER JOIN
              @targetConferenceSeriesId
-         ON Paper.ConferenceSeriesId == @targetConferenceSeriesId.ConferenceSeriesId;
+         ON Papers.ConferenceSeriesId == @targetConferenceSeriesId.ConferenceSeriesId;
  
  
 //Get all reference from [Conference Paper] -> [Other Paper]
@@ -69,17 +69,17 @@ USING Outputters.Tsv(outputHeader : true);
     SELECT @conferencePapers.PaperId,
            @conferencePapers.Year,
            @conferencePapers.VenueId,
-           Paper.PaperId AS ReferenceId,
+           Papers.PaperId AS ReferenceId,
            //A single paper may be published in conference and in a journal later.
            //Use conference as its venue if present otherwise, journal
-           Paper.ConferenceSeriesId == null ? JournalId : ConferenceSeriesId AS ReferenceVenueId
-    FROM Paper
+           Papers.ConferenceSeriesId == null ? JournalId : ConferenceSeriesId AS ReferenceVenueId
+    FROM Papers
          INNER JOIN
-             PaperReference
-         ON Paper.PaperId == PaperReference.PaperReferenceId
+             PaperReferences
+         ON Papers.PaperId == PaperReferences.PaperReferenceId
          INNER JOIN
              @conferencePapers
-         ON PaperReference.PaperId == @conferencePapers.PaperId;
+         ON PaperReferences.PaperId == @conferencePapers.PaperId;
 
 
 //Count number of references between conference and referenced conference

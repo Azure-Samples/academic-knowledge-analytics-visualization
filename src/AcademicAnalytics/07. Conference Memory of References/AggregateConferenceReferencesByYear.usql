@@ -33,28 +33,28 @@ DECLARE @conferenceReferenceMemoryOutPath string = @outputBaseDir + "conferenceR
 
 //Get all conference papers by conference series Id.
 @conferencePapers =
-    SELECT Paper.PaperId,
-           Paper.Year,
-           Paper.CitationCount
-    FROM Paper
+    SELECT Papers.PaperId,
+           Papers.Year,
+           Papers.CitationCount
+    FROM Papers
          INNER JOIN
              @targetConferenceSeriesId
-         ON Paper.ConferenceSeriesId == @targetConferenceSeriesId.ConferenceSeriesId;
+         ON Papers.ConferenceSeriesId == @targetConferenceSeriesId.ConferenceSeriesId;
  
  
 //Get all reference from [conference Paper] -> [referenced paper]
 @conferencePaperReferences =
     SELECT @conferencePapers.PaperId,
            @conferencePapers.Year,
-           Paper.PaperId AS ReferenceId,
-           Paper.Year AS ReferenceYear
-    FROM Paper
+           Papers.PaperId AS ReferenceId,
+           Papers.Year AS ReferenceYear
+    FROM Papers
          INNER JOIN
-             PaperReference
-         ON Paper.PaperId == PaperReference.PaperReferenceId
+             PaperReferences
+         ON Papers.PaperId == PaperReferences.PaperReferenceId
          INNER JOIN
              @conferencePapers
-         ON PaperReference.PaperId == @conferencePapers.PaperId;
+         ON PaperReferences.PaperId == @conferencePapers.PaperId;
 
 
 //Aggregate reference count per conference year and reference paper year to create year matrix for reference count
