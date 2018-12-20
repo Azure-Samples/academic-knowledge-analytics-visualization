@@ -35,8 +35,8 @@ The project contains 13 samples
 
 ### Pre-requisites
 
-* [Get Microsoft Academic Graph on Azure Storage](get-started-setup-provisioning.md)
-* [Set up Azure Data Lake Analytics for Microsoft Academic Graph](get-started-setup-azure-data-lake-analytics.md)
+* [Get Microsoft Academic Graph on Azure Storage](https://docs.microsoft.com/en-us/academic-services/graph/get-started-setup-provisioning)
+* [Set up Azure Data Lake Analytics for Microsoft Academic Graph](https://docs.microsoft.com/en-us/academic-services/graph/get-started-setup-azure-data-lake-analytics)
 * [Microsoft Power BI Desktop client](https://powerbi.microsoft.com/en-us/desktop/)
 * Visual Studio 2017 or Visual Studio 2015 with [Data Lake tools](https://www.microsoft.com/en-us/download/details.aspx?id=49504)
 
