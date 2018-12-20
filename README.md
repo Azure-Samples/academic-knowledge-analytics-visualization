@@ -33,7 +33,7 @@ The project contains 13 samples
 
 ## Getting Started
 
-### Prerequisites
+### Pre-requisites
 
 * [Get Microsoft Academic Graph on Azure Storage](get-started-setup-provisioning.md)
 * [Set up Azure Data Lake Analytics for Microsoft Academic Graph](get-started-setup-azure-data-lake-analytics.md)
