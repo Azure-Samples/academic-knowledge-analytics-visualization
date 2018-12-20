@@ -32,6 +32,7 @@
     <Script Include="07. Conference Memory of References\AggregateConferenceReferencesByYear.usql" />
     <Script Include="08. Conference Top Referenced Venues\AggregateConferenceReferencesByYearAndVenue.usql" />
     <Script Include="09. Conference Top Citing Venues\AggregateConferenceCitationsByYearAndVenue.usql" />
+    <Script Include="10. Conference Trending Topics\ConferenceFieldsOfStudyByCitationGrowthRate.usql" />
     <Script Include="11. Field of Study Entity Counts\AggregateFosEntityCount.usql" />
     <Script Include="12. Organization Insight\GenerateSubgraphForAffiliation.usql" />
     <Script Include="13. Field of Study Top Entities\FieldTopEntitites.usql" />
@@ -65,6 +66,9 @@
     <ScriptCode Include="09. Conference Top Citing Venues\AggregateConferenceCitationsByYearAndVenue.usql.cs">
       <DependentUpon>09. Conference Top Citing Venues\AggregateConferenceCitationsByYearAndVenue.usql</DependentUpon>
     </ScriptCode>
+    <ScriptCode Include="10. Conference Trending Topics\ConferenceFieldsOfStudyByCitationGrowthRate.usql.cs">
+      <DependentUpon>10. Conference Trending Topics\ConferenceFieldsOfStudyByCitationGrowthRate.usql</DependentUpon>
+    </ScriptCode>
     <ScriptCode Include="11. Field of Study Entity Counts\AggregateFosEntityCount.usql.cs">
       <DependentUpon>11. Field of Study Entity Counts\AggregateFosEntityCount.usql</DependentUpon>
     </ScriptCode>
@@ -89,6 +93,7 @@
     <Folder Include="11. Field of Study Entity Counts" />
     <Folder Include="12. Organization Insight" />
     <Folder Include="13. Field of Study Top Entities" />
+    <Folder Include="10. Conference Trending Topics" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="00. Common Scripts\README.md">
@@ -173,6 +178,9 @@
       <SubType>Content</SubType>
     </Content>
     <Content Include="09. Conference Top Citing Venues\README.md">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="10. Conference Trending Topics\README.md">
       <SubType>Content</SubType>
     </Content>
     <Content Include="11. Field of Study Entity Counts\README.md">

@@ -1,4 +1,6 @@
-﻿
+﻿// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
+
 DECLARE @dataVersion string = "mag-##DatasetVersion##";
 DECLARE @blobAccount string = "##YourBlobAccount##";
 DECLARE @uriPrefix   string = "wasb://" + @dataVersion + "@" + @blobAccount + "/";

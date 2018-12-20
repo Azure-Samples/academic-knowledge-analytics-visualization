@@ -14,7 +14,7 @@ This project aims to help data scientists become familar with the Microsoft Acad
 
 ## Samples
 
-The project contains 12 samples 
+The project contains 13 samples 
 
 * [Field of Study Top Authors](https://github.com/Azure-Samples/academic-knowledge-analytics-visualization/tree/master/src/AcademicAnalytics/01.%20Field%20of%20Study%20Top%20Authors)
 * [Field of Study Entity Counts](https://github.com/Azure-Samples/academic-knowledge-analytics-visualization/tree/master/src/AcademicAnalytics/11.%20Field%20of%20Study%20Entity%20Counts)
@@ -26,7 +26,9 @@ The project contains 12 samples
 * [Conference Top Institutions](https://github.com/Azure-Samples/academic-knowledge-analytics-visualization/tree/master/src/AcademicAnalytics/06.%20Conference%20Top%20Institutions)
 * [Conference Memory of References](https://github.com/Azure-Samples/academic-knowledge-analytics-visualization/tree/master/src/AcademicAnalytics/07.%20Conference%20Memory%20of%20References)
 * [Conference Top Referenced Venues](https://github.com/Azure-Samples/academic-knowledge-analytics-visualization/tree/master/src/AcademicAnalytics/08.%20Conference%20Top%20Referenced%20Venues)
-* [Conference Top Citing Venues](https://github.com/Azure-Samples/academic-knowledge-analytics-visualization/tree/master/src/AcademicAnalytics/09.%20Conference%20Top%20Citing%20Venues)
+* [Conference Top Citing Venues](https://github.com/Azure-Samples/academic-knowledge-analytics-visualization/tree/master/src/AcademicAnalytics/
+09.%20Conference%20Top%20Citing%20Venues)
+* [Conference Tredning Topics](https://github.com/Azure-Samples/academic-knowledge-analytics-visualization/tree/master/src/AcademicAnalytics/10.%20Conference%20Trending%20Topics)
 * [Organization Insight](https://github.com/Azure-Samples/academic-knowledge-analytics-visualization/tree/master/src/AcademicAnalytics/12.%20Organization%20Insight)
 
 
@@ -34,11 +36,11 @@ The project contains 12 samples
 
 ### Prerequisites
 
-- An Azure Data Lake Store with a copy of Microsoft Academic Graph
-    - [Azure Data Lake Store](https://azure.microsoft.com/en-us/services/data-lake-store/)
-    - Contact [Academic API](mailto:academicapi@microsoft.com) to get Microsoft Academic Graph access on your data lake store
+- An Azure storage account with a copy of Microsoft Academic Graph
+    - [Get Microsoft Academic Graph on Azure storage](https://docs.microsoft.com/en-us/academic-services/graph/get-started-setup-provisioning)
 - An Azure Data Lake Analytics account
     - [Azure Data Lake Analytics](https://azure.microsoft.com/en-us/services/data-lake-analytics/)
+	- [Set up Azure Data Lake Analytics to use Microsoft Academic Graph](https://docs.microsoft.com/en-us/academic-services/graph/get-started-setup-azure-data-lake-analytics)
 - Power BI Desktop
     - [Microsoft Power BI Desktop](https://powerbi.microsoft.com/en-us/desktop/)
 - Visual Studio with Data lake tools 
