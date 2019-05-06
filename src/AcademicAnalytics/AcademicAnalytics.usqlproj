@@ -36,9 +36,6 @@
     <Script Include="11. Field of Study Entity Counts\AggregateFosEntityCount.usql" />
     <Script Include="12. Organization Insight\GenerateSubgraphForAffiliation.usql" />
     <Script Include="13. Field of Study Top Entities\FieldTopEntitites.usql" />
-    <ScriptCode Include="00. Common Scripts\CreateDatabase.usql.cs">
-      <DependentUpon>00. Common Scripts\CreateDatabase.usql</DependentUpon>
-    </ScriptCode>
     <ScriptCode Include="01. Field of Study Top Authors\AggregateAuthorStatsInField.usql.cs">
       <DependentUpon>01. Field of Study Top Authors\AggregateAuthorStatsInField.usql</DependentUpon>
     </ScriptCode>
