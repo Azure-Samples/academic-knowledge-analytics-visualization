@@ -58,13 +58,13 @@ In prerequisite [Set up Azure Data Lake Analytics](get-started-setup-azure-data-
 
 1. In the [Azure portal](https://portal.azure.com), go to the Azure Data Lake Analytics (ADLA) service that you created, and select **Overview** > **New Job**.
 
-   ![Azure Data Lake Analytics - New job](media/samples-azure-data-lake-hindex/new-job.png "Azure Data Lake Analytics - New job")
+   ![Azure Data Lake Analytics - New job](https://docs.microsoft.com/en-us/academic-services/graph/media/samples-azure-data-lake-analytics/create-database-submit.png "Azure Data Lake Analytics - New job")
 
 1. Copy code in samples/CreateDatabase.usql and paste into the code block.
    
 1. Provide a **Job name** and select **Submit**.
 
-   ![Submit CreateFunctions job](media/samples-azure-data-lake-hindex/create-functions-submit.png "Submit CreateFunctions job")
+   ![Submit CreateFunctions job](https://docs.microsoft.com/en-us/academic-services/graph/media/samples-azure-data-lake-hindex/new-job.png "Submit CreateFunctions job")
 
 1. The job should finish successfully.
 
