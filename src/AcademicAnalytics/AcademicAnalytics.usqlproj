@@ -22,7 +22,6 @@
     <OutputPath>bin\Release\</OutputPath>
   </PropertyGroup>
   <ItemGroup>
-    <Script Include="00. Common Scripts\CreateDatabase.usql" />
     <Script Include="01. Field of Study Top Authors\AggregateAuthorStatsInField.usql" />
     <Script Include="02. Conference Top Authors By Static Rank\AuthorRankInConference.usql" />
     <Script Include="03. Conference Papers Basic Statistics\PaperYearlyStatisticsInConference.usql" />
