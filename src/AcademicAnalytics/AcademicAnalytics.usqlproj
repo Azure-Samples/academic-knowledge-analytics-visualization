@@ -76,7 +76,6 @@
     </ScriptCode>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="00. Common Scripts" />
     <Folder Include="01. Field of Study Top Authors" />
     <Folder Include="02. Conference Top Authors By Static Rank" />
     <Folder Include="03. Conference Papers Basic Statistics" />
@@ -92,9 +91,6 @@
     <Folder Include="10. Conference Trending Topics" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="00. Common Scripts\README.md">
-      <SubType>Content</SubType>
-    </Content>
     <Content Include="01. Field of Study Top Authors\FieldTopAuthors.pbit">
       <SubType>Content</SubType>
     </Content>
