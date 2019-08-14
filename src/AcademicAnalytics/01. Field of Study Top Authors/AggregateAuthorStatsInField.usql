@@ -2,7 +2,7 @@
 // Licensed under the MIT License.
 
 //Make sure to run CreateDatabase script from common scripts first!
-USE DATABASE AcdemicGraph;
+USE DATABASE AcademicGraph;
 
 //*******************Input Variable Section********************************
 //        Change these variables for different calculations
