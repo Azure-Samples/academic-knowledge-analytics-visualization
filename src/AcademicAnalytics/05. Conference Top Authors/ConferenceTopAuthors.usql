@@ -1,8 +1,15 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
-//Make sure to run CreateDatabase script from common scripts first!
-USE DATABASE AcademicGraph;
+// To do:
+//   1. Run samples/CreateFunctions.usql to define functions before running this script
+//   2. Replace <AzureStorageAccount> with your Azure Storage account containing MAG dataset
+//   3. Replace <MagContainer> with the container name in Azure Storage account containing MAG dataset, usually in the form of mag-yyyy-mm-dd
+//
+
+DECLARE @blobAccount     string = "<AzureStorageAccount>";
+DECLARE @blobContainer   string = "<MagContainer>";
+DECLARE @uriPrefix       string = "wasb://" + @blobContainer + "@" + @blobAccount + "/";
 
 //*******************Input Variable Section********************************
 //        Change these variables for different calculations
@@ -17,7 +24,7 @@ DECLARE @conferenceMostCitedAuthorsCount int = 20;  //Number of most cited autho
 //This output path pattern is hardcoded to the pbi file. If this is changed, the pbi file needs to be modified as well
 DECLARE @conferenceAnalyticsBaseDir string = @"/output/conferenceAnalytics/";
 DECLARE @outputBaseDir string = @conferenceAnalyticsBaseDir + @conferenceShortName + "/";
-DECLARE @maDetailPagePrefix = @"https://academic.microsoft.com/#/detail/";
+DECLARE @maDetailPagePrefix = @"https://academic.microsoft.com/author/";
 
 //*************************Ouptut Section**********************************
 //                 All output files for this script.
@@ -27,41 +34,46 @@ DECLARE @conferenceMostCitedAuthorsOutPath string = @outputBaseDir + "conference
 DECLARE @conferenceCitedAuthorsByYearOutPath string = @outputBaseDir + "conferenceCitedAuthorsByYear.tsv";
 
 
-
+// Load Academic Graph data
+@conferenceSeries = ConferenceSeries(@uriPrefix);
+@papers = Papers(@uriPrefix);
+@authors = Authors(@uriPrefix);
+@paperAuthorAffiliations = PaperAuthorAffiliations(@uriPrefix);
+@paperReferences = PaperReferences(@uriPrefix);
 
 //First find the conference series id by matching conference short name.
 @targetConferenceSeriesId =
     SELECT (long?) ConferenceSeriesId AS ConferenceSeriesId //Cast long to long? to join against Paper table
-    FROM ConferenceSeries
+    FROM @conferenceSeries
     WHERE NormalizedName == @conferenceShortName;
 
 
 //Get all conference papers by conference series Id.
 @conferencePapers =
-    SELECT Papers.PaperId,
-           Papers.CitationCount,
-           Papers.OriginalTitle,
-           Papers.Year,
-           Papers.ConferenceSeriesId AS VenueId
-    FROM Papers
+    SELECT @papers.PaperId,
+           @papers.CitationCount,
+           @papers.OriginalTitle,
+           @papers.Year,
+           @papers.ConferenceSeriesId AS VenueId
+    FROM @papers
          INNER JOIN
              @targetConferenceSeriesId
-         ON Papers.ConferenceSeriesId == @targetConferenceSeriesId.ConferenceSeriesId;
+         ON @papers.ConferenceSeriesId == @targetConferenceSeriesId.ConferenceSeriesId;
 
 
 //Get all [conference paper] -> [conference author] relationships
 @conferenceAuthorsPapers =
-    SELECT Authors.DisplayName AS AuthorName,
-           Authors.AuthorId,
+    SELECT @authors.DisplayName AS AuthorName,
+           @authors.AuthorId,
            @conferencePapers.PaperId,
            @conferencePapers.CitationCount
     FROM @conferencePapers
          INNER JOIN
-             PaperAuthorAffiliations
-         ON @conferencePapers.PaperId == PaperAuthorAffiliations.PaperId
+             @paperAuthorAffiliations
+         ON @conferencePapers.PaperId == @paperAuthorAffiliations.PaperId
          INNER JOIN
-             Authors
-         ON PaperAuthorAffiliations.AuthorId == Authors.AuthorId;
+             @authors
+         ON @paperAuthorAffiliations.AuthorId == @authors.AuthorId;
 
 
 //Aggregate citation and publication count for each author
@@ -95,29 +107,29 @@ USING Outputters.Tsv(outputHeader : true);
 @conferencePaperReferences =
     SELECT @conferencePapers.PaperId,
            @conferencePapers.Year,
-           Papers.PaperId AS ReferenceId
-    FROM Papers
+           @papers.PaperId AS ReferenceId
+    FROM @papers
          INNER JOIN
-             PaperReferences
-         ON Papers.PaperId == PaperReferences.PaperReferenceId
+             @paperReferences
+         ON @papers.PaperId == @paperReferences.PaperReferenceId
          INNER JOIN
              @conferencePapers
-         ON PaperReferences.PaperId == @conferencePapers.PaperId;
+         ON @paperReferences.PaperId == @conferencePapers.PaperId;
 
 //Get all conference paper -> paper -> author relationships to find most cited authors
 @conferenceCitedAuthorsPapers =
     SELECT @conferencePaperReferences.PaperId,
            @conferencePaperReferences.Year,
-           Authors.DisplayName AS AuthorName,
-           Authors.AuthorId,
+           @authors.DisplayName AS AuthorName,
+           @authors.AuthorId,
            @conferencePaperReferences.ReferenceId
     FROM @conferencePaperReferences
          INNER JOIN
-             PaperAuthorAffiliations
-         ON @conferencePaperReferences.ReferenceId == PaperAuthorAffiliations.PaperId
+             @paperAuthorAffiliations
+         ON @conferencePaperReferences.ReferenceId == @paperAuthorAffiliations.PaperId
          INNER JOIN
-             Authors
-         ON PaperAuthorAffiliations.AuthorId == Authors.AuthorId;
+             @authors
+         ON @paperAuthorAffiliations.AuthorId == @authors.AuthorId;
 
 
 //Aggregate publication and citation count for each author cited by conference paper

@@ -1,8 +1,15 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
-//Make sure to run CreateDatabase script from common scripts first!
-USE DATABASE AcademicGraph;
+// To do:
+//   1. Run samples/CreateFunctions.usql to define functions before running this script
+//   2. Replace <AzureStorageAccount> with your Azure Storage account containing MAG dataset
+//   3. Replace <MagContainer> with the container name in Azure Storage account containing MAG dataset, usually in the form of mag-yyyy-mm-dd
+//
+
+DECLARE @blobAccount     string = "<AzureStorageAccount>";
+DECLARE @blobContainer   string = "<MagContainer>";
+DECLARE @uriPrefix       string = "wasb://" + @blobContainer + "@" + @blobAccount + "/";
 
 //*******************Input Variable Section********************************
 //        Change these variables for different calculations
@@ -21,40 +28,44 @@ DECLARE @outputBaseDir string = @conferenceAnalyticsBaseDir + @conferenceShortNa
 //*************************************************************************
 DECLARE @conferenceBasicStatsOutPath string = @outputBaseDir + "conferenceBasicStats.tsv";
 
-	
-	
-	
+
+// Load Academic Graph data
+@conferenceSeries = ConferenceSeries(@uriPrefix);
+@papers = Papers(@uriPrefix);
+@paperReferences = PaperReferences(@uriPrefix);
+
+
 //First find the conference series id by matching conference short name.
 @targetConferenceSeriesId =
     SELECT (long?) ConferenceSeriesId AS ConferenceSeriesId //Cast long to long? to join against Paper table
-    FROM ConferenceSeries
+    FROM @conferenceSeries
     WHERE NormalizedName == @conferenceShortName;
 
 
 //Get all conference papers by conference series Id.
 @conferencePapers =
-    SELECT Papers.PaperId,
-           Papers.Year,
-           Papers.CitationCount,
-           Papers.ConferenceSeriesId AS VenueId
-    FROM Papers
+    SELECT @papers.PaperId,
+           @papers.Year,
+           @papers.CitationCount,
+           @papers.ConferenceSeriesId AS VenueId
+    FROM @papers
          INNER JOIN
              @targetConferenceSeriesId
-         ON Papers.ConferenceSeriesId == @targetConferenceSeriesId.ConferenceSeriesId;
- 
- 
+         ON @papers.ConferenceSeriesId == @targetConferenceSeriesId.ConferenceSeriesId;
+
+
 //Get all reference from [Conference Paper] -> [Referenced Paper]
 @conferenceReferencedPapers =
     SELECT @conferencePapers.PaperId,
            @conferencePapers.Year,
-           Papers.PaperId AS ReferenceId
-    FROM Papers
+           @papers.PaperId AS ReferenceId
+    FROM @papers
          INNER JOIN
-             PaperReferences
-         ON Papers.PaperId == PaperReferences.PaperReferenceId
+             @paperReferences
+         ON @papers.PaperId == @paperReferences.PaperReferenceId
          INNER JOIN
              @conferencePapers
-         ON PaperReferences.PaperId == @conferencePapers.PaperId;
+         ON @paperReferences.PaperId == @conferencePapers.PaperId;
 
 
 //Get total reference count for each year

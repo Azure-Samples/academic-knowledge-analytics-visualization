@@ -1,8 +1,15 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
-//Make sure to run CreateDatabase script from common scripts first!
-USE DATABASE AcademicGraph;
+// To do:
+//   1. Run samples/CreateFunctions.usql to define functions before running this script
+//   2. Replace <AzureStorageAccount> with your Azure Storage account containing MAG dataset
+//   3. Replace <MagContainer> with the container name in Azure Storage account containing MAG dataset, usually in the form of mag-yyyy-mm-dd
+//
+
+DECLARE @blobAccount     string = "<AzureStorageAccount>";
+DECLARE @blobContainer   string = "<MagContainer>";
+DECLARE @uriPrefix       string = "wasb://" + @blobContainer + "@" + @blobAccount + "/";
 
 //*******************Input Variable Section********************************
 //        Change these variables for different calculations
@@ -14,18 +21,27 @@ DECLARE @fieldOfStudyLevelToInclude SQL.ARRAY<int> = new SQL.ARRAY<int>{0, 1};
 //        Defining const variables to be used by other parts of the script
 //*************************************************************************
 //This output path pattern is hardcoded to the pbi file. If this is changed, the pbi file needs to be modified as well
-DECLARE @entityAnalyticsBaseDir string = @"/output/fieldAnalytics/";
-DECLARE @outputBaseDir string = @entityAnalyticsBaseDir;
+DECLARE @fieldAnalyticsBaseDir string = @"/output/fieldAnalytics/";
+DECLARE @outputBaseDir string = @fieldAnalyticsBaseDir;
 DECLARE @thisYear int = DateTime.Now.Year;
 
 //*************************Ouptut Section**********************************
 //                 All output files for this script.
 //*************************************************************************
-DECLARE @entityStats_fos_outpath string = @outputBaseDir + "EntityStatsByFOS.tsv";
-DECLARE @entityDetails_outpath string = @outputBaseDir + "EntityDetails.tsv";
-DECLARE @fosDetails_outpath string = @outputBaseDir + "FOSDetails.tsv";
+DECLARE @entityStats_fos_outpath string = @outputBaseDir + "entityStatsByFOS.tsv";
+DECLARE @entityDetails_outpath string = @outputBaseDir + "entityDetails.tsv";
+DECLARE @fosDetails_outpath string = @outputBaseDir + "targetFosDetails.tsv";
 
 
+// Load Academic Graph data
+@papers = Papers(@uriPrefix);
+@fieldsOfStudy = FieldsOfStudy(@uriPrefix);
+@paperFieldsOfStudy = PaperFieldsOfStudy(@uriPrefix);
+@paperAuthorAffiliations = PaperAuthorAffiliations(@uriPrefix);
+@conferenceSeries = ConferenceSeries(@uriPrefix);
+@journals = Journals(@uriPrefix);
+@affiliations = Affiliations(@uriPrefix);
+@authors = Authors(@uriPrefix);
 
 
 //Get all papers and transform PaperRank to probability that can be summed. 
@@ -36,30 +52,31 @@ DECLARE @fosDetails_outpath string = @outputBaseDir + "FOSDetails.tsv";
            Math.Exp((double) Rank * ( - 1.0) / 1000) AS RankScore,
            EstimatedCitation,
            Year
-    FROM Papers;
+    FROM @papers;
 
 //Select target fields of study for ranking by field level
-@fosIds =
-    SELECT FieldOfStudyId
-    FROM FieldsOfStudy
-    WHERE FieldsOfStudy.Level IN @fieldOfStudyLevelToInclude;
+@targetFos =
+    SELECT FieldOfStudyId,
+           NormalizedName AS Name
+    FROM @fieldsOfStudy
+    WHERE Level IN @fieldOfStudyLevelToInclude;
 
 //Get all [Paper] -> [Field of Study] relationships along with paper/field details for later calculation
 @paperFos =
-    SELECT PaperFieldsOfStudy.PaperId,
-           PaperFieldsOfStudy.FieldOfStudyId,
+    SELECT @paperFieldsOfStudy.PaperId,
+           @paperFieldsOfStudy.FieldOfStudyId,
            @papers.JournalId,
            @papers.ConferenceSeriesId,
            @papers.RankScore,
            @papers.EstimatedCitation,
            @papers.Year
-    FROM PaperFieldsOfStudy
+    FROM @paperFieldsOfStudy
          INNER JOIN
-             @fosIds
-         ON PaperFieldsOfStudy.FieldOfStudyId == @fosIds.FieldOfStudyId
+             @targetFos
+         ON @paperFieldsOfStudy.FieldOfStudyId == @targetFos.FieldOfStudyId
          INNER JOIN
              @papers
-         ON PaperFieldsOfStudy.PaperId == @papers.PaperId;
+         ON @paperFieldsOfStudy.PaperId == @papers.PaperId;
 
 
 //Get all [Journal] -> [Paper] -> [Field of Study] relationships
@@ -90,15 +107,15 @@ WHERE @paperFos.ConferenceSeriesId != null;
 @paperAuthorAffiliationFos =
     SELECT @paperFos.PaperId,
            @paperFos.FieldOfStudyId,
-           PaperAuthorAffiliations.AuthorId,
-           PaperAuthorAffiliations.AffiliationId,
+           @paperAuthorAffiliations.AuthorId,
+           @paperAuthorAffiliations.AffiliationId,
            @paperFos.RankScore,
            @paperFos.EstimatedCitation,
            @paperFos.Year
     FROM @paperFos
          JOIN
-             PaperAuthorAffiliations
-         ON @paperFos.PaperId == PaperAuthorAffiliations.PaperId;
+             @paperAuthorAffiliations
+         ON @paperFos.PaperId == @paperAuthorAffiliations.PaperId;
 
 
 //Get all [Paper] -> [Author] relationships
@@ -226,34 +243,28 @@ USING Outputters.Tsv(outputHeader : true);
 
 
 //output all [FieldOfStudyId, Name] for easier lookup in visuals
-@fieldOfStudyDetails =
-    SELECT FieldOfStudyId,
-           NormalizedName AS Name
-    FROM FieldsOfStudy;
-
-
-OUTPUT @fieldOfStudyDetails
+OUTPUT @targetFos
 TO @fosDetails_outpath
 USING Outputters.Tsv(outputHeader : true);
 
 
 //Get all [EntityId, Name] for easier lookup in visuals
 @entityDetails =
-    SELECT Journals.JournalId AS EntityId,
-           Journals.DisplayName AS Name
-    FROM Journals
+    SELECT @journals.JournalId AS EntityId,
+           @journals.DisplayName AS Name
+    FROM @journals
         UNION ALL
-    SELECT ConferenceSeries.ConferenceSeriesId AS EntityId,
-           ConferenceSeries.NormalizedName AS Name
-    FROM ConferenceSeries
+    SELECT @conferenceSeries.ConferenceSeriesId AS EntityId,
+           @conferenceSeries.NormalizedName AS Name
+    FROM @conferenceSeries
         UNION ALL 
-    SELECT Affiliations.AffiliationId AS EntityId, 
-           Affiliations.DisplayName AS Name
-    FROM Affiliations 
+    SELECT @affiliations.AffiliationId AS EntityId, 
+           @affiliations.DisplayName AS Name
+    FROM @affiliations 
         UNION ALL 
-    SELECT Authors.AuthorId AS EntityId, 
-           Authors.DisplayName AS Name 
-    FROM Authors;
+    SELECT @authors.AuthorId AS EntityId, 
+           @authors.DisplayName AS Name 
+    FROM @authors;
 
 
 //Get all distinct EntityIds

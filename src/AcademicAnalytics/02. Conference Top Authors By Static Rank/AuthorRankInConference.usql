@@ -1,8 +1,15 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
-//Make sure to run CreateDatabase script from common scripts first!
-USE DATABASE AcademicGraph;
+// To do:
+//   1. Run samples/CreateFunctions.usql to define functions before running this script
+//   2. Replace <AzureStorageAccount> with your Azure Storage account containing MAG dataset
+//   3. Replace <MagContainer> with the container name in Azure Storage account containing MAG dataset, usually in the form of mag-yyyy-mm-dd
+//
+
+DECLARE @blobAccount     string = "<AzureStorageAccount>";
+DECLARE @blobContainer   string = "<MagContainer>";
+DECLARE @uriPrefix       string = "wasb://" + @blobContainer + "@" + @blobAccount + "/";
 
 //*******************Input Variable Section********************************
 //        Change these variables for different calculations
@@ -23,38 +30,43 @@ DECLARE @outputBaseDir string = @conferenceAnalyticsBaseDir + @conferenceShortNa
 DECLARE @authorRankOutPath string = @outputBaseDir + "conferenceTopAuthorsByStaticRank.tsv";
 
 
+// Load Academic Graph data
+@conferenceSeries = ConferenceSeries(@uriPrefix);
+@papers = Papers(@uriPrefix);
+@authors = Authors(@uriPrefix);
+@paperAuthorAffiliations = PaperAuthorAffiliations(@uriPrefix);
 
 
 //First find the conference series id by matching conference short name.
 @targetConferenceSeriesId =
     SELECT (long?) ConferenceSeriesId AS ConferenceSeriesId //Cast long to long? to join against Paper table
-    FROM ConferenceSeries
+    FROM @conferenceSeries
     WHERE NormalizedName == @conferenceShortName;
 
 
 //Get all conference papers by conference series Id.
 @conferencePapers =
-    SELECT Papers.PaperId,
-           (Papers.Rank * -0.001) AS LogProbRank //Rank is stored in the graph as LogProbRank*-1000
-    FROM Papers
+    SELECT @papers.PaperId,
+           (@papers.Rank * -0.001) AS LogProbRank //Rank is stored in the graph as LogProbRank*-1000
+    FROM @papers
          INNER JOIN
              @targetConferenceSeriesId
-         ON Papers.ConferenceSeriesId == @targetConferenceSeriesId.ConferenceSeriesId;
+         ON @papers.ConferenceSeriesId == @targetConferenceSeriesId.ConferenceSeriesId;
 
 
 //Get all [conference paper] -> [conference author] relationships
 @conferenceAuthorsPapers =
-    SELECT Authors.DisplayName AS AuthorName,
-           Authors.AuthorId,
+    SELECT @authors.DisplayName AS AuthorName,
+           @authors.AuthorId,
            @conferencePapers.PaperId,
            @conferencePapers.LogProbRank AS LogProbRank 
     FROM @conferencePapers
          INNER JOIN
-             PaperAuthorAffiliations
-         ON @conferencePapers.PaperId == PaperAuthorAffiliations.PaperId
+             @paperAuthorAffiliations
+         ON @conferencePapers.PaperId == @paperAuthorAffiliations.PaperId
          INNER JOIN
-             Authors
-         ON PaperAuthorAffiliations.AuthorId == Authors.AuthorId;
+             @authors
+         ON @paperAuthorAffiliations.AuthorId == @authors.AuthorId;
 
 
 //Aggregate static rank and publication for each author 

@@ -35,10 +35,10 @@ The project contains 13 samples
 
 ### Pre-requisites
 
-* [Get Microsoft Academic Graph on Azure Storage](https://docs.microsoft.com/en-us/academic-services/graph/get-started-setup-provisioning)
-* [Set up Azure Data Lake Analytics for Microsoft Academic Graph](https://docs.microsoft.com/en-us/academic-services/graph/get-started-setup-azure-data-lake-analytics)
-* [Microsoft Power BI Desktop client](https://powerbi.microsoft.com/en-us/desktop/)
-* Visual Studio 2017 or Visual Studio 2015 with [Data Lake tools](https://www.microsoft.com/en-us/download/details.aspx?id=49504)
+* [Get Microsoft Academic Graph on Azure Storage](https://docs.microsoft.com/academic-services/graph/get-started-setup-provisioning)
+* [Set up Azure Data Lake Analytics for Microsoft Academic Graph](https://docs.microsoft.com/academic-services/graph/get-started-setup-azure-data-lake-analytics)
+* [Microsoft Power BI Desktop client](https://powerbi.microsoft.com/desktop/)
+* Visual Studio 2017 or Visual Studio 2015 with [Data Lake tools](https://www.microsoft.com/download/details.aspx?id=49504)
 
 ### Gather the information that you need
 
@@ -52,29 +52,33 @@ The project contains 13 samples
 
    :heavy_check_mark:  The name of the container in your Azure Storage (AS) account containing MAG dataset.
 
-### Create database from MAG data before running analytics examples
+### Define functions to extract MAG data
 
-In prerequisite [Set up Azure Data Lake Analytics](get-started-setup-azure-data-lake-analytics.md), you added the Azure Storage  (AS) created for MAG provision as a data source for the Azure Data Lake Analytics service (ADLA). In this section, you submit an ADLA job to create database from MAG data.
+In prerequisite [Set up Azure Data Lake Analytics](get-started-setup-azure-data-lake-analytics.md), you added the Azure Storage (AS) created for MAG provision as a data source for the Azure Data Lake Analytics service (ADLA). In this section, you submit an ADLA job to create functions extracting MAG data from Azure Storage (AS).
 
-1. In the [Azure portal](https://portal.azure.com), go to the Azure Data Lake Analytics (ADLA) service that you created, and select **Overview** > **New Job**.
+1. Download `samples/CreateFunctions.usql` to local drive. <br> From [Azure portal](https://portal.azure.com), go to the Azure Storage account > **Containers > [mag-yyyy-mm-dd] > samples > CreateFunctions.usql > Download**.
 
-   ![Azure Data Lake Analytics - New job](https://docs.microsoft.com/en-us/academic-services/graph/media/samples-azure-data-lake-hindex/new-job.png "Azure Data Lake Analytics - New job")
+   ![Download CreateFunctions.usql](https://docs.microsoft.com/academic-services/graph/media/samples-azure-data-lake-hindex/create-functions-download.png "Download CreateFunctions.usql")
 
-1. Copy code in samples/CreateDatabase.usql and paste into the code block.
-   
-1. Provide a **Job name** and select **Submit**.
+1. Go to the Azure Data Lake Analytics (ADLA) service that you created, and select **Overview > New job > Open file**. Select `CreateFunctions.usql` in your local drive.
 
-   ![Submit CreateFunctions job](https://docs.microsoft.com/en-us/academic-services/graph/media/samples-azure-data-lake-analytics/create-database-submit.png "Submit CreateDatabase job")
+   ![New job - Open CreateFunctions.usql](https://docs.microsoft.com/academic-services/graph/media/samples-azure-data-lake-hindex/create-functions-open.png "New job - Open CreateFunctions.usql")
+
+1. Select **Submit**.
+
+   ![Submit CreateFunctions job](https://docs.microsoft.com/academic-services/graph/media/samples-azure-data-lake-hindex/create-functions-submit.png "Submit CreateFunctions job")
 
 1. The job should finish successfully.
 
-#### Running Example Analytics
+   ![CreateFunctions job status](https://docs.microsoft.com/academic-services/graph/media/samples-azure-data-lake-hindex/create-functions-status.png "CreateFunctions job status")
+
+### Running Example Analytics
 1. Download or clone the repository.
 2. Open the solution /src/AcademicAnalytics.sln
 3. For each tutorial there should be: A USQL script(.usql), a Power BI report(.pbix), a Power BI template(.pbit) and a README explaining the tutorial. 
 4. Althought each tutorial is different, running the USQL script as is and filling out the Power BI template using the same USQL parameters should give you a Power BI report with visualizations that match the Power BI report example included in the tutorial. Since the Microsoft Academic graph is contently improving, different graph verions may give you slightly different results.
 
-#### Working with USQL scripts 
+### Working with USQL scripts 
 - How to run
     - Make sure you have selected your ADLA account
 
@@ -99,19 +103,19 @@ In prerequisite [Set up Azure Data Lake Analytics](get-started-setup-azure-data-
     ![Azure Data lake Analyatics Data explorer2](images/ADLADataExplorer2.png)
 
 
-#### Using Power BI 
+### Using Power BI 
 - Make sure USQL script finished sucessfully
 - Open up corresponding Power BI Template(.pbit) from file explorer (Visual studio doesn't recognize Power BI files) 
 - Enter your ADL information and parameters corrisponding to your scripts
-![Sample template load](/images/PBITemplateInitParam.png)
+![Sample template load](images/PBITemplateInitParam.png)
 - Make sure the parameters cases are the same as your script and "click" to load
 
 ## Resources
 
-- [Get started with Azure Data Lake Analytics using Azure portal](https://docs.microsoft.com/en-us/azure/data-lake-analytics/data-lake-analytics-get-started-portal)
-- [Develop USQL scripts by using Data Lake Tools for Visual Studio](https://docs.microsoft.com/en-us/azure/data-lake-analytics/data-lake-analytics-data-lake-tools-get-started)
-- [Get started with USQL](https://docs.microsoft.com/en-us/azure/data-lake-analytics/data-lake-analytics-u-sql-get-started)
-- [Deep Dive into Query Parameters and Power BI Templates](https://powerbi.microsoft.com/en-us/blog/deep-dive-into-query-parameters-and-power-bi-templates/)
-- [Manage Azure Data Lake Store resources by using Storage Explorer](https://docs.microsoft.com/en-us/azure/data-lake-store/data-lake-store-in-storage-explorer)
-- [Scalable Data Science with Azure Data Lake: An end-to-end Walkthrough](https://docs.microsoft.com/en-us/azure/machine-learning/team-data-science-process/data-lake-walkthrough)
+- [Get started with Azure Data Lake Analytics using Azure portal](https://docs.microsoft.com/azure/data-lake-analytics/data-lake-analytics-get-started-portal)
+- [Develop USQL scripts by using Data Lake Tools for Visual Studio](https://docs.microsoft.com/azure/data-lake-analytics/data-lake-analytics-data-lake-tools-get-started)
+- [Get started with USQL](https://docs.microsoft.com/azure/data-lake-analytics/data-lake-analytics-u-sql-get-started)
+- [Deep Dive into Query Parameters and Power BI Templates](https://powerbi.microsoft.com/blog/deep-dive-into-query-parameters-and-power-bi-templates/)
+- [Manage Azure Data Lake Store resources by using Storage Explorer](https://docs.microsoft.com/azure/data-lake-store/data-lake-store-in-storage-explorer)
+- [Scalable Data Science with Azure Data Lake: An end-to-end Walkthrough](https://docs.microsoft.com/azure/machine-learning/team-data-science-process/data-lake-walkthrough)
 - [Microsoft Academic Website](https://academic.microsoft.com/)

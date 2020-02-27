@@ -1,8 +1,15 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
-//Make sure to run CreateDatabase script from common scripts first!
-USE DATABASE AcademicGraph;
+// To do:
+//   1. Run samples/CreateFunctions.usql to define functions before running this script
+//   2. Replace <AzureStorageAccount> with your Azure Storage account containing MAG dataset
+//   3. Replace <MagContainer> with the container name in Azure Storage account containing MAG dataset, usually in the form of mag-yyyy-mm-dd
+//
+
+DECLARE @blobAccount     string = "<AzureStorageAccount>";
+DECLARE @blobContainer   string = "<MagContainer>";
+DECLARE @uriPrefix       string = "wasb://" + @blobContainer + "@" + @blobAccount + "/";
 
 //*******************Input Variable Section********************************
 //        Change these variables for different calculations
@@ -22,35 +29,41 @@ DECLARE @lastYear int = DateTime.Today.Year - 1;
 //*************************Ouptut Section**********************************
 //                 All output files for this script.
 //*************************************************************************
-DECLARE @conferenceFieldsOfStudyOutPath string = @"/output/conferenceAnalytics/" + @conferenceShortName  + "/conferenceFieldsOfStudy.tsv";
-DECLARE @conferenceFieldsOfStudyYearlyStatsOutPath string = @"/output/conferenceAnalytics/" + @conferenceShortName  + "/conferenceFieldsOfStudyYearlyStats.tsv";
+DECLARE @conferenceFieldsOfStudyOutPath string = @outputBaseDir  + "conferenceFieldsOfStudy.tsv";
+DECLARE @conferenceFieldsOfStudyYearlyStatsOutPath string = @outputBaseDir  + "conferenceFieldsOfStudyYearlyStats.tsv";
 
 
+// Load Academic Graph data
+@conferenceSeries = ConferenceSeries(@uriPrefix);
+@papers = Papers(@uriPrefix);
+@paperFieldsOfStudy = PaperFieldsOfStudy(@uriPrefix);
+@fieldsOfStudy = FieldsOfStudy(@uriPrefix);
 
 
 //First find the conference series id by matching conference short name.
 @targetConferenceSeriesId =
     SELECT (long?) ConferenceSeriesId AS ConferenceSeriesId //Cast long to long? to join against Paper table
-    FROM ConferenceSeries
+    FROM @conferenceSeries
     WHERE NormalizedName == @conferenceShortName;
 
 
 //Get all conference papers by conference series Id.
 @conferencePapers =
-    SELECT Papers.PaperId,
-           Papers.CitationCount,
-           Papers.Year
-    FROM Papers
+    SELECT @papers.PaperId,
+           @papers.CitationCount,
+           (int) @papers.Year AS Year
+    FROM @papers
          INNER JOIN
              @targetConferenceSeriesId
-         ON Papers.ConferenceSeriesId == @targetConferenceSeriesId.ConferenceSeriesId;
+         ON @papers.ConferenceSeriesId == @targetConferenceSeriesId.ConferenceSeriesId
+    WHERE @papers.Year != null;
 
 
 //Calculate normalized citation growth rate for each conference field of study
 //Normalized Citation Growth Rate = Citation Growth Rate * Citation Growth  (Mutiplying citation growth to normalize such that new and old topics can be more comparable)
 //        = CitationCountFromLastYear / CitationCountFromStartYear * TotalCitationCountBetweenStartYearAndNow
 @conferencePapersFosNormalizedGrowthRate =
-    SELECT PaperFieldsOfStudy.FieldOfStudyId,
+    SELECT @paperFieldsOfStudy.FieldOfStudyId,
            //Saftely cast int? to int since a paper must have year attribute.
            (int) MIN(@conferencePapers.Year) AS FieldMinYear, 
            (int) MAX(@conferencePapers.Year) AS FieldMaxYear,
@@ -74,24 +87,24 @@ DECLARE @conferenceFieldsOfStudyYearlyStatsOutPath string = @"/output/conference
                             @conferencePapers.CitationCount : 0) AS CitationCountIn5Year
     FROM @conferencePapers
          INNER JOIN
-             PaperFieldsOfStudy
-         ON @conferencePapers.PaperId == PaperFieldsOfStudy.PaperId
-    GROUP BY PaperFieldsOfStudy.FieldOfStudyId;
+             @paperFieldsOfStudy
+         ON @conferencePapers.PaperId == @paperFieldsOfStudy.PaperId
+    GROUP BY @paperFieldsOfStudy.FieldOfStudyId;
 
 
 //For each conference field of study, get additional fields of study information from FieldsOfStudy table
 @conferenceFieldsOfStudy =
-    SELECT FieldsOfStudy.FieldOfStudyId,
-           FieldsOfStudy.DisplayName AS FieldName,
-           FieldsOfStudy.Level,
+    SELECT @fieldsOfStudy.FieldOfStudyId,
+           @fieldsOfStudy.DisplayName AS FieldName,
+           @fieldsOfStudy.Level,
            @conferencePapersFosNormalizedGrowthRate.FieldMinYear,
            @conferencePapersFosNormalizedGrowthRate.FieldMaxYear,
            @conferencePapersFosNormalizedGrowthRate.NormalizedCitationGrowthRate,
            @conferencePapersFosNormalizedGrowthRate.CitationCountIn5Year
-    FROM FieldsOfStudy
+    FROM @fieldsOfStudy
          INNER JOIN
              @conferencePapersFosNormalizedGrowthRate
-         ON @conferencePapersFosNormalizedGrowthRate.FieldOfStudyId == FieldsOfStudy.FieldOfStudyId;
+         ON @conferencePapersFosNormalizedGrowthRate.FieldOfStudyId == @fieldsOfStudy.FieldOfStudyId;
 
 
 OUTPUT @conferenceFieldsOfStudy
@@ -117,15 +130,15 @@ USING Outputters.Tsv(outputHeader : true);
 @conferencePapersFosYearlyStats =
     SELECT @conferenceFieldOfStudyYearly.FieldOfStudyId,
            @conferenceFieldOfStudyYearly.Year,
-           SUM(@conferencePapers.Year == null? 0 : 1) AS PublicationCount,
-           SUM(@conferencePapers.Year == null? 0: @conferencePapers.CitationCount) AS CitationCount
+           COUNT() AS PublicationCount,
+           SUM(@conferencePapers.CitationCount) AS CitationCount
     FROM @conferencePapers
          INNER JOIN
-             PaperFieldsOfStudy
-         ON @conferencePapers.PaperId == PaperFieldsOfStudy.PaperId
+             @paperFieldsOfStudy
+         ON @conferencePapers.PaperId == @paperFieldsOfStudy.PaperId
          RIGHT OUTER JOIN //Right outer such that we include each year from @conferenceFieldOfStudyYearly even if there's no citation
              @conferenceFieldOfStudyYearly
-         ON PaperFieldsOfStudy.FieldOfStudyId == @conferenceFieldOfStudyYearly.FieldOfStudyId && @conferencePapers.Year == @conferenceFieldOfStudyYearly.Year
+         ON @paperFieldsOfStudy.FieldOfStudyId == @conferenceFieldOfStudyYearly.FieldOfStudyId && @conferencePapers.Year == @conferenceFieldOfStudyYearly.Year
     GROUP BY @conferenceFieldOfStudyYearly.FieldOfStudyId,
              @conferenceFieldOfStudyYearly.Year;
 

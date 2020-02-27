@@ -8,7 +8,7 @@
     <ProjectGuid>7cee7d00-a99c-480a-8f7c-8adbed6a0abb</ProjectGuid>
     <OutputType>File</OutputType>
     <AssemblyName>Algebra.xml</AssemblyName>
-    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <Name>AcademicAnalytics</Name>
     <RootNamespace>AcademicAnalytics</RootNamespace>
     <RuntimeVersion>default</RuntimeVersion>

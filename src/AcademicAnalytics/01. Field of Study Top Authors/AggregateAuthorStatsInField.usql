@@ -1,8 +1,15 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
-//Make sure to run CreateDatabase script from common scripts first!
-USE DATABASE AcademicGraph;
+// To do:
+//   1. Run samples/CreateFunctions.usql to define functions before running this script
+//   2. Replace <AzureStorageAccount> with your Azure Storage account containing MAG dataset
+//   3. Replace <MagContainer> with the container name in Azure Storage account containing MAG dataset, usually in the form of mag-yyyy-mm-dd
+//
+
+DECLARE @blobAccount     string = "<AzureStorageAccount>";
+DECLARE @blobContainer   string = "<MagContainer>";
+DECLARE @uriPrefix       string = "wasb://" + @blobContainer + "@" + @blobAccount + "/";
 
 //*******************Input Variable Section********************************
 //        Change these variables for different calculations
@@ -23,26 +30,32 @@ DECLARE @outputBaseDir string = @fieldAnalyticsBaseDir + Uri.EscapeUriString(@fi
 DECLARE @fieldTopAuthorsOutPath string = @outputBaseDir + @"topAuthors.tsv";
 
 
+// Load Academic Graph data
+@fieldsOfStudy = FieldsOfStudy(@uriPrefix);
+@paperFieldsOfStudy = PaperFieldsOfStudy(@uriPrefix);
+@paperReferences = PaperReferences(@uriPrefix);
+@paperAuthorAffiliations = PaperAuthorAffiliations(@uriPrefix);
+@authors = Authors(@uriPrefix);
 
 
 //Get all paperIds for the field
 @fieldPaperIds =
-    SELECT PaperFieldsOfStudy.PaperId
-    FROM FieldsOfStudy
+    SELECT @paperFieldsOfStudy.PaperId
+    FROM @fieldsOfStudy
          INNER JOIN
-             PaperFieldsOfStudy
-         ON FieldsOfStudy.FieldOfStudyId == PaperFieldsOfStudy.FieldOfStudyId
-    WHERE FieldsOfStudy.NormalizedName == @fieldName;
+             @paperFieldsOfStudy
+         ON @fieldsOfStudy.FieldOfStudyId == @paperFieldsOfStudy.FieldOfStudyId
+    WHERE @fieldsOfStudy.NormalizedName == @fieldName;
 
 
 //Get all [citing paper] -> [field paper] relationships
 @fieldCitations =
-    SELECT PaperReferences.PaperId,
-           PaperReferences.PaperReferenceId 
-    FROM PaperReferences
+    SELECT @paperReferences.PaperId,
+           @paperReferences.PaperReferenceId 
+    FROM @paperReferences
          INNER JOIN
              @fieldPaperIds
-         ON @fieldPaperIds.PaperId == PaperReferences.PaperReferenceId;
+         ON @fieldPaperIds.PaperId == @paperReferences.PaperReferenceId;
 
 
 //For each field paper, count incoming reference to get citation count
@@ -55,21 +68,21 @@ DECLARE @fieldTopAuthorsOutPath string = @outputBaseDir + @"topAuthors.tsv";
 
 //Get top authors by citation count
 @fieldAuthors =
-    SELECT Authors.AuthorId,
-           ANY_VALUE(Authors.DisplayName) AS AuthorName, //Guaranteed to have only 1 value since AuthorId is the key
+    SELECT @authors.AuthorId,
+           ANY_VALUE(@authors.DisplayName) AS AuthorName, //Guaranteed to have only 1 value since AuthorId is the key
            COUNT( @fieldPapersWithCitationCount.PaperId ) AS PublicationCount,
            SUM(@fieldPapersWithCitationCount.CitationCount) AS CitationCount
     FROM @fieldPapersWithCitationCount
          //First join against PaperAuthorAffiliation to get field paper -> field author relationship.
          JOIN
-             PaperAuthorAffiliations
-         ON PaperAuthorAffiliations.PaperId == @fieldPapersWithCitationCount.PaperId
+             @paperAuthorAffiliations
+         ON @paperAuthorAffiliations.PaperId == @fieldPapersWithCitationCount.PaperId
          //Then join against Author to get detail author information.
          JOIN
-            Authors   
-         ON PaperAuthorAffiliations.AuthorId == Authors.AuthorId
+            @authors   
+         ON @paperAuthorAffiliations.AuthorId == @authors.AuthorId
     //Aggregate over authorId to cacluate publication/ciation count for each author
-    GROUP BY Authors.AuthorId
+    GROUP BY @authors.AuthorId
     ORDER BY CitationCount DESC
     FETCH @fieldTopAuthorsCount ROWS;
 

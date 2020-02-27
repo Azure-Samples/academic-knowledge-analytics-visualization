@@ -1,8 +1,15 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
-//Make sure to run CreateDatabase script from common scripts first!
-USE DATABASE AcdemicGraph;
+// To do:
+//   1. Run samples/CreateFunctions.usql to define functions before running this script
+//   2. Replace <AzureStorageAccount> with your Azure Storage account containing MAG dataset
+//   3. Replace <MagContainer> with the container name in Azure Storage account containing MAG dataset, usually in the form of mag-yyyy-mm-dd
+//
+
+DECLARE @blobAccount     string = "<AzureStorageAccount>";
+DECLARE @blobContainer   string = "<MagContainer>";
+DECLARE @uriPrefix       string = "wasb://" + @blobContainer + "@" + @blobAccount + "/";
 
 //Change this variable to do calculation for different conferences
 DECLARE @conferenceShortName string = "WWW";
@@ -14,7 +21,7 @@ DECLARE @conferenceTopPapersCount = 20;
 //This output path pattern is hardcoded to the pbi file. If this is changed, the pbi file needs to be modified as well
 DECLARE @conferenceAnalyticsBaseDir string = @"/output/conferenceAnalytics/";
 DECLARE @outputBaseDir string = @conferenceAnalyticsBaseDir + @conferenceShortName + "/";
-DECLARE @maDetailPagePrefix = @"https://academic.microsoft.com/#/detail/";
+DECLARE @maDetailPagePrefix = @"https://academic.microsoft.com/paper/";
 DECLARE @lastYear int = DateTime.Today.Year - 1;
 
 //*************************Ouptut Section**********************************
@@ -23,27 +30,30 @@ DECLARE @lastYear int = DateTime.Today.Year - 1;
 DECLARE @conferenceTopPapersOutPath string = @outputBaseDir + "conferenceTopPapers.tsv";
 
 
+// Load Academic Graph data
+@conferenceSeries = ConferenceSeries(@uriPrefix);
+@papers = Papers(@uriPrefix);
 
 
 //First find the conference series id by matching conference short name.
 @targetConferenceSeriesId =
     SELECT (long?) ConferenceSeriesId AS ConferenceSeriesId //Cast long to long? to join against Paper table
-    FROM ConferenceSeries
+    FROM @conferenceSeries
     WHERE NormalizedName == @conferenceShortName;
 
 
 //Get all conference papers by conference series Id.
 @conferencePapers =
-    SELECT Papers.PaperId,
-           Papers.OriginalTitle,
-           Papers.Year,
-           Papers.CitationCount,
-           Papers.EstimatedCitation, //Will use estimated citation count to select top papers
-           Papers.ConferenceSeriesId AS VenueId
-    FROM Papers
+    SELECT @papers.PaperId,
+           @papers.OriginalTitle,
+           @papers.Year,
+           @papers.CitationCount,
+           @papers.EstimatedCitation, //Will use estimated citation count to select top papers
+           @papers.ConferenceSeriesId AS VenueId
+    FROM @papers
          INNER JOIN
              @targetConferenceSeriesId
-         ON Papers.ConferenceSeriesId == @targetConferenceSeriesId.ConferenceSeriesId;
+         ON @papers.ConferenceSeriesId == @targetConferenceSeriesId.ConferenceSeriesId;
 
 
 //Select top conference papers based on estimated citation count
